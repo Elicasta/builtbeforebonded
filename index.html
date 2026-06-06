@@ -2372,8 +2372,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -3765,6 +3765,7 @@ function openQAWall(opts = {}) {
   document.body.classList.add('wall-open');
   const wall = document.getElementById('qa-wall');
   if (wall) wall.classList.add('on');
+  updateQAWallFeaturedDisplay();
   renderQACards();
   updateQABadge();
 
@@ -3802,6 +3803,7 @@ function receiveQAWallPayload(payload = {}) {
   document.body.classList.add('wall-open');
   const wall = document.getElementById('qa-wall');
   if (wall) wall.classList.add('on');
+  updateQAWallFeaturedDisplay();
   renderQACards();
   updateQABadge();
 }
@@ -3842,13 +3844,14 @@ function renderQACards() {
   if (countLabel) countLabel.textContent = questions.length + ' question' + (questions.length !== 1 ? 's' : '');
 
   if (!questions.length) {
+    updateQAWallFeaturedDisplay(null);
     const emptyHtml = '<div class="qa-empty">No questions yet. Attendees can submit using the Ask a Question button.</div>';
     if (container.innerHTML !== emptyHtml) container.innerHTML = emptyHtml;
     container.dataset.sig = 'empty';
     return;
   }
 
-  const sig = questions.map(q => `${q.id}:${q.text}:${q.id === featuredQId}`).join('|') + `|admin:${isAdmin}`;
+  const sig = questions.map(q => `${q.id}:${q.text}:${q.name || ''}:${q.ts || ''}:${String(q.id) === String(featuredQId)}`).join('|') + `|featured:${featuredQId || ''}|admin:${isAdmin}`;
   if (container.dataset.sig === sig) return;
   container.dataset.sig = sig;
 
@@ -3866,29 +3869,55 @@ function renderQACards() {
     </div>`).join('');
 }
 
-function featureQuestion(id) {
-  featuredQId = id;
-  const q = questions.find(x => x.id === id);
-  if (!q) return;
-
-  // Update featured panel
+function updateQAWallFeaturedDisplay(questionLike) {
   const featQ = document.getElementById('qa-featured-q');
   const featName = document.getElementById('qa-featured-name');
-  if (featQ) {
-    featQ.innerHTML = q.text;
-    featQ.style.animation = 'none';
-    void featQ.offsetWidth;
-    featQ.style.animation = 'fuUp .5s ease';
+
+  let q = questionLike || null;
+  if (!q && featuredQId !== null && featuredQId !== undefined) {
+    q = questions.find(x => String(x.id) === String(featuredQId));
   }
-  if (featName) featName.textContent = q.anonymous ? 'Anonymous' : q.name;
+
+  if (!featQ) return;
+
+  if (!q || !q.text) {
+    featQ.innerHTML = '<span class="qa-featured-empty">Tap a question to feature it on screen</span>';
+    if (featName) featName.textContent = '';
+    return;
+  }
+
+  featQ.textContent = q.text;
+  featQ.style.animation = 'none';
+  void featQ.offsetWidth;
+  featQ.style.animation = 'fuUp .5s ease';
+
+  if (featName) {
+    featName.textContent = q.anonymous ? 'Anonymous' : (q.name || 'Anonymous');
+  }
+}
+
+function featureQuestion(id) {
+  featuredQId = id;
+  const q = questions.find(x => String(x.id) === String(id));
+  if (!q) return;
+
+  updateQAWallFeaturedDisplay(q);
 
   // Re-render cards to highlight featured
   renderQACards();
   playTone('slide');
 
-  // Broadcast to projector if connected
+  // Broadcast to projector if connected. Include the full question bank so the
+  // projector can update the wall even when it is running in a separate tab.
   if (isAdmin) {
-    const payload = { text: q.text, name: q.anonymous ? 'Anonymous' : q.name };
+    const payload = {
+      id: q.id,
+      featuredQId: q.id,
+      text: q.text,
+      name: q.anonymous ? 'Anonymous' : (q.name || 'Anonymous'),
+      anonymous: !!q.anonymous,
+      questions: questions || []
+    };
     emitLocalSync('feature-question', payload);
     if (realtimeChannel) realtimeChannel.send({
       type: 'broadcast',
@@ -3899,24 +3928,50 @@ function featureQuestion(id) {
 }
 
 // Handle featured question on projector / attendee side
-function handleFeaturedQuestion(payload) {
+function handleFeaturedQuestion(payload = {}) {
   if (!isProjector) return;
-  // Remove any existing overlay
+
+  // Keep projector state in sync with admin.
+  if (Array.isArray(payload.questions)) {
+    questions = payload.questions;
+    try { localStorage.setItem('bbb_qs', JSON.stringify(questions)); } catch(e) {}
+  }
+  if (payload.featuredQId !== undefined) featuredQId = payload.featuredQId;
+  else if (payload.id !== undefined) featuredQId = payload.id;
+
+  const wall = document.getElementById('qa-wall');
+  const wallIsOpen = wall && wall.classList.contains('on');
+
+  const q = questions.find(x => String(x.id) === String(featuredQId)) || {
+    id: payload.id,
+    text: payload.text,
+    name: payload.name || 'Anonymous',
+    anonymous: payload.name === 'Anonymous'
+  };
+
+  // If the Q&A wall is already on screen, feature the question inside the
+  // “Now Answering” panel instead of hiding the wall behind a second overlay.
+  if (wallIsOpen) {
+    updateQAWallFeaturedDisplay(q);
+    renderQACards();
+    return;
+  }
+
+  // Otherwise, use a full-screen featured question overlay above the slide.
   const existing = document.getElementById('feat-q-overlay');
   if (existing) existing.remove();
 
   const overlay = document.createElement('div');
   overlay.id = 'feat-q-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:8000;background:rgba(13,13,13,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 40px;animation:fuUp .5s ease;cursor:pointer';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10080;background:rgba(13,13,13,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 40px;animation:fuUp .5s ease;cursor:pointer';
   overlay.innerHTML = `
     <div style="font-family:var(--fc);font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;display:flex;align-items:center;gap:12px;max-width:700px;width:100%"><span style="flex:1;height:1px;background:#2A2A2A"></span>Q &amp; A<span style="flex:1;height:1px;background:#2A2A2A"></span></div>
-    <div style="font-family:var(--fd);font-size:clamp(28px,5vw,64px);color:#F1EEE7;text-transform:uppercase;line-height:.97;margin-bottom:24px;max-width:900px">${payload.text}</div>
-    <div style="font-family:var(--fc);font-size:.8rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:48px">${payload.name || ''}</div>
+    <div style="font-family:var(--fd);font-size:clamp(28px,5vw,64px);color:#F1EEE7;text-transform:uppercase;line-height:.97;margin-bottom:24px;max-width:900px">${q.text || ''}</div>
+    <div style="font-family:var(--fc);font-size:.8rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:48px">${q.anonymous ? 'Anonymous' : (q.name || payload.name || '')}</div>
     <div style="font-family:var(--fc);font-size:.54rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(184,137,59,.4)">Tap to dismiss</div>`;
   const remove = () => overlay.remove();
   overlay.addEventListener('click', remove);
   document.body.appendChild(overlay);
-  // Auto-remove after 45s
   setTimeout(remove, 45000);
 }
 
