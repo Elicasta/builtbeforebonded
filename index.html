@@ -2372,8 +2372,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -3830,11 +3830,32 @@ function hideResponse(id) {
   if (card) { card.style.opacity = '0'; card.style.transform = 'scale(.95)'; card.style.transition = 'all .25s'; setTimeout(() => card.remove(), 250); }
 }
 function hideQuestion(id) {
-  questions = questions.filter(q => q.id !== id);
+  questions = questions.filter(q => String(q.id) !== String(id));
   try { localStorage.setItem('bbb_qs', JSON.stringify(questions)); } catch(e) {}
   renderQACards();
   renderQALiveFeed();
   updateQABadge();
+}
+
+
+function qaEscapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function qaFindById(id) {
+  return questions.find(x => String(x.id) === String(id));
+}
+function qaFeatureFromElement(el) {
+  const id = el && el.dataset ? el.dataset.qid : null;
+  if (id !== null && id !== undefined) featureQuestion(id);
+}
+function qaHideFromElement(el) {
+  const id = el && el.dataset ? el.dataset.qid : null;
+  if (id !== null && id !== undefined) hideQuestion(id);
 }
 
 function renderQACards() {
@@ -3851,24 +3872,32 @@ function renderQACards() {
     return;
   }
 
-  const sig = questions.map(q => `${q.id}:${q.text}:${q.name || ''}:${q.ts || ''}:${String(q.id) === String(featuredQId)}`).join('|') + `|featured:${featuredQId || ''}|admin:${isAdmin}`;
-  if (container.dataset.sig === sig) return;
+  const sig = questions.map(q => `${String(q.id)}:${q.text}:${q.name || ''}:${q.ts || ''}:${String(q.id) === String(featuredQId)}`).join('|') + `|featured:${featuredQId || ''}|admin:${isAdmin}|clickfix:v2`;
+  if (container.dataset.sig === sig) {
+    updateQAWallFeaturedDisplay();
+    return;
+  }
   container.dataset.sig = sig;
 
-  container.innerHTML = questions.map((q, i) => `
-    <div class="qa-card${q.id === featuredQId ? ' featured' : ''}" onclick="${isAdmin ? `featureQuestion(${q.id})` : ''}">
+  container.innerHTML = questions.map((q, i) => {
+    const qid = qaEscapeHtml(q.id);
+    const isFeatured = String(q.id) === String(featuredQId);
+    return `
+    <div class="qa-card${isFeatured ? ' featured' : ''}" data-qid="${qid}" onclick="qaFeatureFromElement(this)">
       <div class="qa-card-num">${i + 1}</div>
       <div style="flex:1">
-        <div class="qa-card-text">${q.text}</div>
-        <div class="qa-card-meta">${q.name || 'Anonymous'} &middot; ${q.ts || ''}</div>
+        <div class="qa-card-text">${qaEscapeHtml(q.text)}</div>
+        <div class="qa-card-meta">${qaEscapeHtml(q.name || 'Anonymous')} &middot; ${qaEscapeHtml(q.ts || '')}</div>
       </div>
       ${isAdmin ? `<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
-        <button class="qa-card-action" onclick="event.stopPropagation();featureQuestion(${q.id})">&#9654; Feature</button>
-        <button onclick="event.stopPropagation();hideQuestion(${q.id})" style="background:rgba(155,69,39,.2);border:1px solid rgba(155,69,39,.3);color:var(--rl);font-family:var(--fc);font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;cursor:pointer">&#10005; Hide</button>
+        <button class="qa-card-action" data-qid="${qid}" onclick="event.stopPropagation();qaFeatureFromElement(this)">&#9654; Feature</button>
+        <button data-qid="${qid}" onclick="event.stopPropagation();qaHideFromElement(this)" style="background:rgba(155,69,39,.2);border:1px solid rgba(155,69,39,.3);color:var(--rl);font-family:var(--fc);font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;cursor:pointer">&#10005; Hide</button>
       </div>` : ''}
-    </div>`).join('');
-}
+    </div>`;
+  }).join('');
 
+  updateQAWallFeaturedDisplay();
+}
 function updateQAWallFeaturedDisplay(questionLike) {
   const featQ = document.getElementById('qa-featured-q');
   const featName = document.getElementById('qa-featured-name');
@@ -3897,9 +3926,14 @@ function updateQAWallFeaturedDisplay(questionLike) {
 }
 
 function featureQuestion(id) {
-  featuredQId = id;
-  const q = questions.find(x => String(x.id) === String(id));
+  const qid = String(id);
+  let q = qaFindById(qid);
+  if (!q) {
+    loadQuestions();
+    q = qaFindById(qid);
+  }
   if (!q) return;
+  featuredQId = q.id;
 
   updateQAWallFeaturedDisplay(q);
 
@@ -4032,10 +4066,10 @@ function renderQALiveFeed() {
   const newIds = qs.map(q => q.id).join(',');
   if (existingIds !== newIds) {
     feed.innerHTML = qs.map((q, i) => `
-      <div data-qid="${q.id}" style="background:var(--bgc);border:1px solid var(--ln);padding:16px 20px;display:flex;gap:14px;align-items:flex-start;animation:fuUp .4s ease">
+      <div data-qid="${qaEscapeHtml(q.id)}" style="background:var(--bgc);border:1px solid var(--ln);padding:16px 20px;display:flex;gap:14px;align-items:flex-start;animation:fuUp .4s ease">
         <div style="font-family:var(--fd);font-size:1.6rem;color:var(--ln);line-height:1;min-width:28px">${i+1}</div>
         <div style="flex:1">
-          <div style="font-family:var(--fc);font-size:.9rem;color:var(--w);line-height:1.4">${q.text}</div>
+          <div style="font-family:var(--fc);font-size:.9rem;color:var(--w);line-height:1.4">${qaEscapeHtml(q.text)}</div>
           <div style="font-family:var(--fc);font-size:.58rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--mu);margin-top:5px">${q.anonymous ? 'Anonymous' : q.name} &middot; ${q.ts||''}</div>
         </div>
       </div>`).join('');
@@ -4045,12 +4079,12 @@ function renderQALiveFeed() {
     const existingAdminIds = [...adminList.querySelectorAll('[data-qid]')].map(el => el.dataset.qid).join(',');
     if (existingAdminIds !== newIds) {
       adminList.innerHTML = qs.map((q, i) => `
-        <div class="rsp-item" data-qid="${q.id}" style="display:flex;gap:10px;align-items:flex-start">
+        <div class="rsp-item" data-qid="${qaEscapeHtml(q.id)}" style="display:flex;gap:10px;align-items:flex-start">
           <div style="flex:1">
             <div class="rsp-meta">${q.anonymous ? 'Anonymous' : q.name} &middot; ${q.ts||''}</div>
-            <div class="rsp-text">${q.text}</div>
+            <div class="rsp-text">${qaEscapeHtml(q.text)}</div>
           </div>
-          <button class="qa-card-action" onclick="featureQuestion(${q.id})" style="flex-shrink:0">&#9654; Feature</button>
+          <button class="qa-card-action" data-qid="${qaEscapeHtml(q.id)}" onclick="qaFeatureFromElement(this)" style="flex-shrink:0">&#9654; Feature</button>
         </div>`).join('');
     }
   }
@@ -4508,15 +4542,15 @@ function admRenderQA() {
 
   // Diff render — only update if content actually changed
   const newHtml = questions.map((q, i) => `
-    <div class="adm-qa-item" data-qid="${q.id}">
+    <div class="adm-qa-item" data-qid="${qaEscapeHtml(q.id)}">
       <div class="adm-qa-num">${i+1}</div>
       <div style="flex:1">
-        <div class="adm-qa-text">${q.text}</div>
-        <div class="adm-qa-meta">${q.name} &middot; ${q.ts||''}</div>
+        <div class="adm-qa-text">${qaEscapeHtml(q.text)}</div>
+        <div class="adm-qa-meta">${qaEscapeHtml(q.name)} &middot; ${qaEscapeHtml(q.ts||'')}</div>
       </div>
       <div class="adm-qa-actions">
-        <button class="adm-qa-feat" onclick="admFeature(${q.id})">&#9654; Feature</button>
-        <button class="adm-qa-hide" onclick="admHideQ(${q.id})">&#10005; Hide</button>
+        <button class="adm-qa-feat" data-qid="${qaEscapeHtml(q.id)}" onclick="admFeatureFromElement(this)">&#9654; Feature</button>
+        <button class="adm-qa-hide" data-qid="${qaEscapeHtml(q.id)}" onclick="admHideQFromElement(this)">&#10005; Hide</button>
       </div>
     </div>`).join('');
 
@@ -4526,9 +4560,18 @@ function admRenderQA() {
   if (existingIds !== newIds) list.innerHTML = newHtml;
 }
 
+function admFeatureFromElement(el) {
+  const id = el && el.dataset ? el.dataset.qid : null;
+  if (id !== null && id !== undefined) admFeature(id);
+}
+function admHideQFromElement(el) {
+  const id = el && el.dataset ? el.dataset.qid : null;
+  if (id !== null && id !== undefined) admHideQ(id);
+}
+
 function admFeature(id) {
   featureQuestion(id);
-  const q = questions.find(x => x.id === id);
+  const q = qaFindById(id);
   const display = document.getElementById('adm-featured-display');
   const text = document.getElementById('adm-featured-text');
   if (display) display.classList.add('show');
