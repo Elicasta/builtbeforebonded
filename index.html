@@ -559,10 +559,10 @@ body.am #ssl .presenter-bar { display: block; }
 .rw-filter.on { border-color: var(--gold); color: var(--gold); background: rgba(184,137,59,.07); }
 .rw-body { flex: 1; overflow-y: auto; padding: 24px; }
 .rw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-.rw-card { background: var(--bgd); border: 1px solid var(--ln); padding: 18px; animation: fuUp .5s ease; }
-.rw-card-cat { font-family: var(--fc); font-size: .56rem; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
-.rw-card-text { font-family: var(--fc); font-size: .88rem; color: var(--w); line-height: 1.5; }
-.rw-card-name { font-family: var(--fc); font-size: .58rem; color: var(--mu); margin-top: 8px; }
+.rw-card { background: var(--bgd); border: 1px solid var(--ln); padding: 24px 28px; animation: fuUp .5s ease; }
+.rw-card-cat { font-family: var(--fc); font-size: .65rem; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+.rw-card-text { font-family: var(--fc); font-size: 1.1rem; color: var(--w); line-height: 1.55; }
+.rw-card-name { font-family: var(--fc); font-size: .65rem; color: var(--mu); margin-top: 10px; }
 .rw-empty { font-family: var(--fc); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--mu); text-align: center; padding: 60px 0; }
 
 /* ── SESSION COMPLETE CARD ── */
@@ -605,7 +605,7 @@ body.am #ssl .presenter-bar { display: block; }
 #constellation-cv { display: block; width: 100%; flex: 1; }
 
 /* ── FOUNDATION PROGRESS ── */
-.foundation-bar { display: flex; align-items: center; padding: 6px 20px; background: var(--bg); border-bottom: 1px solid var(--ln); gap: 12px; overflow: hidden; }
+.foundation-bar { display: none !important; }
 .foundation-label { font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--mu); white-space: nowrap; flex-shrink: 0; }
 .foundation-drawing { flex: 1; height: 32px; position: relative; }
 #foundation-svg { width: 100%; height: 32px; }
@@ -671,7 +671,57 @@ body.projector-mode .ss-stage { background: #000; }
 body.projector-mode #constellation-wall { z-index: 5000; }
 body.projector-mode #response-wall { z-index: 5000; }
 
-/* Projector waiting screen */
+/* ══════════════════════════════════════
+   PROJECTOR MODE — LARGE SCREEN LAYOUT
+   ══════════════════════════════════════ */
+body.projector-mode .slide {
+  padding: 60px 80px !important;
+  justify-content: center !important;
+}
+/* Teaching slides */
+body.projector-mode .sl-te { padding: 80px 100px !important; }
+body.projector-mode .sl-te-hl { font-size: clamp(48px, 6vw, 96px) !important; max-width: 100% !important; margin-bottom: 40px !important; }
+body.projector-mode .sl-te-num { font-size: clamp(100px, 16vw, 200px) !important; }
+body.projector-mode .sl-pts { max-width: 100% !important; }
+body.projector-mode .sl-pts li { font-size: clamp(20px, 2.4vw, 36px) !important; padding: 14px 0 !important; line-height: 1.35 !important; }
+/* Scripture slides */
+body.projector-mode .sl-sc { padding: 80px 100px !important; }
+body.projector-mode .sl-sc-ref { font-size: 1rem !important; letter-spacing: .22em !important; margin-bottom: 28px !important; }
+body.projector-mode .sl-sc-text { font-size: clamp(24px, 3.2vw, 48px) !important; max-width: 100% !important; margin-bottom: 32px !important; line-height: 1.4 !important; }
+body.projector-mode .sl-sc-tk { font-size: clamp(28px, 3.8vw, 56px) !important; max-width: 100% !important; }
+/* Quote slides */
+body.projector-mode .sl-qt { padding: 80px 120px !important; }
+body.projector-mode .sl-qm { font-size: clamp(80px, 12vw, 140px) !important; }
+body.projector-mode .sl-qt-text { font-size: clamp(36px, 5.5vw, 80px) !important; max-width: 100% !important; line-height: .97 !important; }
+body.projector-mode .sl-qa { font-size: .9rem !important; }
+/* Conversation slides */
+body.projector-mode .sl-cv { padding: 80px 100px !important; }
+body.projector-mode .sl-cv-q { font-size: clamp(36px, 5vw, 72px) !important; max-width: 100% !important; }
+body.projector-mode .sl-cv-n { font-size: clamp(18px, 2vw, 28px) !important; max-width: 100% !important; }
+body.projector-mode .sl-cv-hdr { font-size: .85rem !important; }
+/* Workbook slides */
+body.projector-mode .sl-wb { padding: 60px 80px !important; }
+body.projector-mode .sl-wb-q { font-size: clamp(36px, 4.5vw, 64px) !important; max-width: 100% !important; }
+body.projector-mode .sl-wb-i { font-size: clamp(16px, 1.8vw, 24px) !important; }
+body.projector-mode .sl-wb-items { max-width: 100% !important; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; gap: 8px !important; }
+body.projector-mode .sl-wb-item { font-size: clamp(14px, 1.6vw, 22px) !important; padding: 10px 14px !important; }
+/* Closing slides */
+body.projector-mode .sl-cl { padding: 80px 100px !important; }
+body.projector-mode .sl-cl-title { font-size: clamp(36px, 5vw, 72px) !important; margin-bottom: 32px !important; }
+body.projector-mode .sl-cl-list li { font-size: clamp(18px, 2.2vw, 32px) !important; padding: 12px 0 12px 16px !important; }
+/* Prayer slides */
+body.projector-mode .sl-pr { padding: 80px 100px !important; }
+body.projector-mode .sl-pr-title { font-size: clamp(40px, 5.5vw, 76px) !important; margin-bottom: 28px !important; }
+body.projector-mode .sl-pr-pts li { font-size: clamp(16px, 2vw, 28px) !important; padding: 10px 0 10px 16px !important; }
+/* Cover slide */
+body.projector-mode .sl-cover-title .t-built,
+body.projector-mode .sl-cover-title .t-before,
+body.projector-mode .sl-cover-title .t-bonded { font-size: clamp(60px, 10vw, 130px) !important; }
+body.projector-mode .sl-cover-sess { font-size: clamp(36px, 5vw, 68px) !important; }
+body.projector-mode .sl-cover-body { padding: 48px 80px !important; }
+/* Session complete */
+body.projector-mode .sl-complete-title { font-size: clamp(40px, 6vw, 80px) !important; }
+body.projector-mode .sl-complete-icon { font-size: clamp(60px, 9vw, 110px) !important; }
 .projector-wait { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 500; }
 .projector-wait.hidden { display: none; }
 .pw-title { font-family: var(--fd); line-height: .88; text-transform: uppercase; margin-bottom: 8px; }
@@ -1161,7 +1211,7 @@ body.am .qa-bank-btn { display: flex; }
    ══════════════════════════════════════ */
 @media (min-width: 768px) {
   /* Hub hero two-column on tablet */
-  .hub-hero > div { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .hub-hero > div { display: block; }
 
   /* Workbook tabs don't need to scroll on tablet */
   .wb-tab { font-size: .66rem; padding: 10px 16px; }
@@ -1381,7 +1431,7 @@ body.am .qa-bank-btn { display: flex; }
     </nav>
     <div class="hub-right">
       <span class="user-chip" id="user-chip"></span>
-      <button class="ask-q-btn" onclick="openAskDrawer()" style="font-size:.6rem;padding:5px 10px;letter-spacing:.1em">? Ask</button>
+      <button class="ask-q-btn" onclick="openSSAskPopup()" style="font-size:.6rem;padding:5px 10px;letter-spacing:.1em">? Ask</button>
       <button class="qa-bank-btn" id="qa-bank-btn" onclick="openQAWall()">Q Bank <span class="qa-count-badge" id="qa-badge">0</span></button>
       <button class="btn-ghost btn" onclick="showModal('admin')" id="admin-btn">Admin</button>
     </div>
@@ -1978,7 +2028,9 @@ body.am .qa-bank-btn { display: flex; }
       <button class="adm-tool-btn" onclick="openWall()">&#9641; Wall</button>
       <button class="adm-tool-btn" onclick="openConstellation()">&#10022; Stars</button>
       <button class="adm-tool-btn" onclick="openQAWall()">&#9998; Q Wall</button>
+      <button class="adm-tool-btn" onclick="killFeaturedQuestion()" style="color:var(--rl);border-color:rgba(155,69,39,.3)" title="Kill featured question overlay on projector">&#10005; Kill Q</button>
       <button class="adm-tool-btn adm-view-btn" onclick="switchToAttendee()">&#128100; Attendee</button>
+      <button class="adm-tool-btn" onclick="confirmResetSession()" style="color:var(--rl);border-color:rgba(155,69,39,.3)" title="Reset all session data">&#8635; Reset</button>
       <button class="adm-tool-btn" onclick="adminLogout()" style="color:var(--rl);border-color:rgba(155,69,39,.3)" title="Log out of admin">&#10005; Logout</button>
     </div>
   </div>
@@ -2109,8 +2161,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2301,9 +2353,12 @@ function restoreAnswers() {
 async function submit(btn, key, cat, sess, q) {
   const card = btn.closest('.wb-qc');
   const ta = card.querySelector('.wb-ta');
-  const text = ta ? ta.value.trim() : '';
+  const textFromTA = ta ? ta.value.trim() : '';
+  // Also collect any checked items
+  const checkedItems = [...card.querySelectorAll('.wb-cl li.ck')].map(li => li.textContent.trim()).filter(Boolean);
+  const text = textFromTA || (checkedItems.length ? checkedItems.join(', ') : '');
   if (!text) return;
-  const anon = card.querySelector('.tog').classList.contains('on');
+  const anon = card.querySelector('.tog') ? card.querySelector('.tog').classList.contains('on') : false;
   const payload = { name: anon ? 'Anonymous' : (userName || 'Attendee'), session: sess, category: cat, response: text, anonymous: anon };
   if (window.SB_URL && window.SB_KEY) {
     try {
@@ -3754,6 +3809,38 @@ function initProjectorQR() {
     makeQR('proj-qr-apostolic', 'https://apostolicguide.com');
   };
   document.head.appendChild(script);
+}
+
+function killFeaturedQuestion() {
+  // Remove locally
+  const ov = document.getElementById('feat-q-overlay');
+  if (ov) ov.remove();
+  // Broadcast dismiss to projector and attendees
+  if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'dismiss-question', payload: {} });
+}
+
+function confirmResetSession() {
+  if (!confirm('Reset ALL session data?\n\nThis will clear:\n- All workbook answers\n- All questions\n- All responses\n- All localStorage\n\nThis cannot be undone.')) return;
+  // Clear localStorage
+  const keysToKeep = ['bbb_a', 'bbb_u', 'bbb_name', 'bbb_email'];
+  Object.keys(localStorage).forEach(k => {
+    if (!keysToKeep.includes(k)) localStorage.removeItem(k);
+  });
+  // Clear Supabase tables if configured
+  if (window.SB_URL && window.SB_KEY) {
+    const headers = { 'apikey': window.SB_KEY, 'Authorization': 'Bearer ' + window.SB_KEY };
+    ['responses', 'questions', 'attendees'].forEach(table => {
+      fetch(`${window.SB_URL}/rest/v1/${table}?id=gte.0`, { method: 'DELETE', headers })
+        .catch(() => {});
+    });
+  }
+  // Reset in-memory state
+  liveData = [];
+  questions = [];
+  // Refresh UI
+  admRenderQA();
+  admRenderResponses();
+  alert('Session reset. All data cleared.');
 }
 
 function adminLogout() {
