@@ -2106,16 +2106,20 @@ document.addEventListener('DOMContentLoaded', () => {
   drawFoundation();
   setInterval(drawFoundation, 60000);
   // restore session
-  // Check projector mode immediately — doesn't need login
+  // Check projector mode immediately — show waiting screen right away, Supabase is optional
   if (new URLSearchParams(window.location.search).has('projector')) {
-    initRealtimeSync();
-  }
-  if (localStorage.getItem('bbb_u') === '1') {
-    showHub();
-    setTimeout(checkResume, 1500);
-  }
-  if (localStorage.getItem('bbb_a') === '1') {
-    activateAdmin(); // activateAdmin now calls showAdminHub internally
+    document.body.classList.add('projector-mode');
+    document.getElementById('projector-wait').classList.remove('hidden');
+    initProjectorQR();
+    initRealtimeSync(); // attempt realtime if Supabase configured
+  } else {
+    if (localStorage.getItem('bbb_u') === '1') {
+      showHub();
+      setTimeout(checkResume, 1500);
+    }
+    if (localStorage.getItem('bbb_a') === '1') {
+      activateAdmin();
+    }
   }
   const n = localStorage.getItem('bbb_name');
   if (n) { userName = n; setUserName(n); }
@@ -2695,9 +2699,10 @@ function initRealtimeSync() {
 
 // ── PROJECTOR MODE ──
 function initProjectorMode() {
+  // These may already be set at boot — safe to re-apply
   document.body.classList.add('projector-mode');
-  document.getElementById('projector-wait').classList.remove('hidden');
-  initProjectorQR();
+  const waitEl = document.getElementById('projector-wait');
+  if (waitEl) waitEl.classList.remove('hidden');
 
   // Load Supabase realtime client
   loadSupabaseClient(() => {
