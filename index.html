@@ -2370,8 +2370,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2649,11 +2649,14 @@ function startLivePoll() {
       kw.forEach((words, i) => {
         const el = document.getElementById('rl' + (i+1)); if (!el) return;
         const rows = d.filter(x => words.some(k => x.category && x.category.includes(k)));
-        if (rows.length) el.innerHTML = rows.map(x => `<div class="rsp-item"><div class="rsp-meta">${x.name||'Anon'} &middot; ${x.category} &middot; ${new Date(x.created_at).toLocaleTimeString()}</div><div class="rsp-text">${x.response||''}</div></div>`).join('');
+        if (rows.length) {
+          const html = rows.map(x => `<div class="rsp-item"><div class="rsp-meta">${x.name||'Anon'} &middot; ${x.category} &middot; ${new Date(x.created_at).toLocaleTimeString()}</div><div class="rsp-text">${x.response||''}</div></div>`).join('');
+          if (el.dataset.sig !== html) { el.dataset.sig = html; el.innerHTML = html; }
+        }
       });
       updateSlideFeed(d);
       if (document.getElementById('response-wall').classList.contains('on')) renderWall();
-      if (document.getElementById('constellation-wall').classList.contains('on')) startConstellation();
+      // Do not restart the constellation during polling. It causes visible resets/flicker.
     } catch(e) {}
     pollQuestions();
   }, 4000);
@@ -2663,7 +2666,8 @@ function updateSlideFeed(data) {
   const sess = parseInt(f.dataset.sess), cat = f.dataset.cat;
   const rows = (data || []).map(normalizeResponseRow).filter(x => Number(x.session) === Number(sess) && x.category && x.category.includes(cat) && x.response).slice(0, 5);
   const items = f.querySelector('.sl-live-items'); if (!items) return;
-  items.innerHTML = rows.length ? rows.map(x => `<div class="sl-live-item"><span class="nm">${x.name||'Anon'}</span>${x.response||''}</div>`).join('') : '<div class="sl-live-empty">Waiting for responses...</div>';
+  const html = rows.length ? rows.map(x => `<div class="sl-live-item"><span class="nm">${x.name||'Anon'}</span>${x.response||''}</div>`).join('') : '<div class="sl-live-empty">Waiting for responses...</div>';
+  if (items.dataset.sig !== html) { items.dataset.sig = html; items.innerHTML = html; }
 }
 function buildAudit() {
   const areas = ['Time management','Sleep discipline','Phone use','Prayer/devotion','School or work','Money habits','Home responsibility','Follow-through','Emotional control','Career direction'];
@@ -3090,7 +3094,8 @@ function handleLocalSyncEvent(message = {}) {
   }
   if (event === 'show-constellation') {
     if (isProjector) {
-      try { openConstellation({ fromBroadcast: true, sess: payload.sess || 0 }); } catch(e) {}
+      try { if (payload && Array.isArray(payload.responses)) liveData = payload.responses.map(normalizeResponseRow).filter(r => r.response); } catch(e) {}
+      try { openConstellation({ fromBroadcast: true, sess: payload && payload.sess || 0 }); } catch(e) {}
     }
     return;
   }
@@ -3190,6 +3195,7 @@ function initProjectorMode() {
         closeQAWall({ fromBroadcast: true });
       })
       .on('broadcast', { event: 'show-constellation' }, ({ payload }) => {
+        try { if (payload && Array.isArray(payload.responses)) liveData = payload.responses.map(normalizeResponseRow).filter(r => r.response); } catch(e) {}
         try { openConstellation({ fromBroadcast: true, sess: payload && payload.sess ? payload.sess : 0 }); } catch(e) {}
       })
       .on('broadcast', { event: 'close-constellation' }, () => {
@@ -3963,18 +3969,24 @@ function updateQAWallFeaturedDisplay(questionLike) {
   if (!featQ) return;
 
   if (!q || !q.text) {
-    featQ.innerHTML = '<span class="qa-featured-empty">Tap a question to feature it on screen</span>';
-    if (featName) featName.textContent = '';
+    const empty = '<span class="qa-featured-empty">Tap a question to feature it on screen</span>';
+    if (featQ.dataset.sig !== 'empty') { featQ.dataset.sig = 'empty'; featQ.innerHTML = empty; }
+    if (featName && featName.textContent !== '') featName.textContent = '';
     return;
   }
 
-  featQ.textContent = q.text;
-  featQ.style.animation = 'none';
-  void featQ.offsetWidth;
-  featQ.style.animation = 'fuUp .5s ease';
+  const sig = `${q.id || ''}:${q.text}:${q.name || ''}:${q.anonymous ? '1' : '0'}`;
+  if (featQ.dataset.sig !== sig) {
+    featQ.dataset.sig = sig;
+    featQ.textContent = q.text;
+    featQ.style.animation = 'none';
+    void featQ.offsetWidth;
+    featQ.style.animation = 'fuUp .5s ease';
+  }
 
   if (featName) {
-    featName.textContent = q.anonymous ? 'Anonymous' : (q.name || 'Anonymous');
+    const who = q.anonymous ? 'Anonymous' : (q.name || 'Anonymous');
+    if (featName.textContent !== who) featName.textContent = who;
   }
 }
 
@@ -5654,38 +5666,42 @@ function initParticles() {
 }
 // ══════════════════════════════════════════════════════
 // FAIL-SAFE CONSTELLATION OVERRIDE
-// Constellation is intentionally non-critical. If it errors, it closes itself
-// and leaves slides, response wall, Q&A overlay, and projector state untouched.
-// ══════════════════════════════════════════════════════
+// Non-critical projector-only emotional constellation.
+// If anything fails, it closes itself and leaves slides, response wall, Q&A, and projector state untouched.
 (function(){
   let safeAnimFrame = null;
   let safeFilterSess = 0;
   let safeSeed = 13;
+  let safeStarted = 0;
+  let safeItemsSig = '';
+  let safeCachedItems = [];
 
   function safeRand(){
     safeSeed = (safeSeed * 1664525 + 1013904223) % 4294967296;
     return safeSeed / 4294967296;
   }
 
+  function safeText(v){
+    return String(v || '').replace(/\s+/g,' ').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").trim();
+  }
+
   function safeNormalize(row){
-    try {
-      return typeof normalizeResponseRow === 'function' ? normalizeResponseRow(row || {}) : (row || {});
-    } catch(e) { return row || {}; }
+    try { return typeof normalizeResponseRow === 'function' ? normalizeResponseRow(row || {}) : (row || {}); }
+    catch(e) { return row || {}; }
+  }
+
+  function responseText(r){
+    return safeText(r && (r.response || r.text || r.answer || r.content || r.message || r.value));
   }
 
   function safeRows(){
     try {
       let source = [];
-      try {
-        if (Array.isArray(liveData) && liveData.length) source = liveData;
-      } catch(e) {}
+      try { if (Array.isArray(liveData) && liveData.length) source = liveData; } catch(e) {}
       if (!source.length) {
         try { source = getLocalResponses() || []; } catch(e) { source = []; }
       }
-      let rows = source.map(safeNormalize).filter(r => {
-        const txt = String((r && (r.response || r.text || r.answer || r.content || r.message || r.value)) || '').trim();
-        return txt.length > 0;
-      });
+      let rows = (Array.isArray(source) ? source : []).map(safeNormalize).filter(r => responseText(r));
       const allowed = [1,2,3];
       rows = rows.filter(r => {
         const sess = Number(r && r.session);
@@ -5699,66 +5715,94 @@ function initParticles() {
     }
   }
 
-  function safeText(v){
-    return String(v || '').replace(/\s+/g,' ').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").trim();
+  function softKeywords(text){
+    const stop = new Set('the and a an i to of in my that is for it me was have not but be are with this do we so on at as they or can if what you he she how all their just has very up one its when by from about into there who out more no will than your our been get got had him his her them then these those some like also really dont cant wont ive im were where which while would could should may might must need want feel felt think know said say see saw going come came back time make made take took even still much many long well way now here day good great because being after before again most only other over same such used yeah okay yes nope sure right left let put set show tell told lord god jesus'.split(' '));
+    return safeText(text).toLowerCase()
+      .replace(/[^a-z\s'-]/g,' ')
+      .replace(/[-']/g,'')
+      .split(/\s+/)
+      .map(w => w.trim())
+      .filter(w => w.length >= 4 && !stop.has(w) && /^[a-z]+$/.test(w));
   }
 
-  function safeFragments(rows){
+  function buildConstellationItems(rows){
     const seen = new Set();
-    const fragments = [];
-    try {
-      rows.forEach((r, idx) => {
-        const raw = safeText(r.response || r.text || r.answer || r.content || r.message || r.value);
-        if (!raw) return;
-        const parts = raw.length <= 135 ? [raw] : raw.split(/(?<=[.!?])\s+|\n+/).map(safeText).filter(Boolean);
-        parts.forEach(part => {
-          let t = safeText(part);
-          if (t.length < 3) return;
-          if (t.length > 150) t = t.slice(0, 147).trim() + '...';
-          const key = t.toLowerCase();
-          if (seen.has(key)) return;
-          seen.add(key);
-          fragments.push({
-            text: t,
-            name: safeText(r.name) || (r.anonymous ? 'Anonymous' : 'Attendee'),
-            category: safeText(r.category),
-            session: Number(r.session) || 0,
-            idx
-          });
-        });
+    const items = [];
+    const freq = {};
+
+    rows.forEach(r => softKeywords(responseText(r)).forEach(w => { freq[w] = (freq[w] || 0) + 1; }));
+
+    rows.forEach((r, idx) => {
+      const raw = responseText(r);
+      if (!raw) return;
+      const name = safeText(r.name) || (r.anonymous ? 'Anonymous' : 'Attendee');
+      const category = safeText(r.category);
+      const parts = raw.length <= 95 ? [raw] : raw.split(/(?<=[.!?])\s+|\n+/).map(safeText).filter(Boolean);
+      parts.forEach(part => {
+        let text = safeText(part);
+        if (text.length < 3) return;
+        if (text.length > 118) text = text.slice(0,115).trim() + '...';
+        const key = text.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        items.push({ kind:'thought', text, name, category, weight: 1.05, idx });
       });
-    } catch(e) {
-      console.warn('Constellation fragment build failed safely:', e);
-    }
-    return fragments.slice(0, 48);
+    });
+
+    Object.entries(freq)
+      .sort((a,b) => b[1] - a[1])
+      .slice(0, 34)
+      .forEach(([word, count], idx) => {
+        if (seen.has('kw:'+word)) return;
+        seen.add('kw:'+word);
+        items.push({ kind:'word', text: word, name:'', category:'', weight: Math.min(2.4, 1 + count * .16), idx: idx + 500 });
+      });
+
+    // Deterministic shuffle so the shape feels organic but does not jump every frame.
+    safeSeed = 97 + items.length;
+    return items
+      .map(item => ({ item, sort: safeRand() }))
+      .sort((a,b) => a.sort - b.sort)
+      .map(x => x.item)
+      .slice(0, 96);
   }
 
-  function roundRect(ctx,x,y,w,h,r){
-    try {
-      const rr = Math.min(r,w/2,h/2);
-      ctx.beginPath();
-      ctx.moveTo(x+rr,y);
-      ctx.arcTo(x+w,y,x+w,y+h,rr);
-      ctx.arcTo(x+w,y+h,x,y+h,rr);
-      ctx.arcTo(x,y+h,x,y,rr);
-      ctx.arcTo(x,y,x+w,y,rr);
-      ctx.closePath();
-    } catch(e) {
-      ctx.rect(x,y,w,h);
+  function currentSig(rows){
+    return rows.map(r => `${r.id || r.created_at || r.t || ''}:${responseText(r)}`).join('|') + `|sess:${safeFilterSess}`;
+  }
+
+  function measureLine(ctx, line){ return ctx.measureText(line).width; }
+
+  function wrapText(ctx, text, maxW, maxLines){
+    const words = safeText(text).split(/\s+/);
+    const lines = [];
+    let line = '';
+    words.forEach(word => {
+      const test = line ? line + ' ' + word : word;
+      if (measureLine(ctx, test) > maxW && line) {
+        if (lines.length < maxLines) lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    });
+    if (line && lines.length < maxLines) lines.push(line);
+    if (lines.length === maxLines && lines.join(' ').length < safeText(text).length) {
+      lines[maxLines-1] = lines[maxLines-1].replace(/[.,;:]?$/, '') + '...';
     }
+    return lines;
   }
 
   function safeCloseOnly(){
     try {
       const wall = document.getElementById('constellation-wall');
       if (wall) wall.classList.remove('on');
-      document.body.classList.remove('wall-open');
       if (safeAnimFrame) cancelAnimationFrame(safeAnimFrame);
       safeAnimFrame = null;
     } catch(e) {}
   }
 
-  window.startConstellation = startConstellation = function(){
+  window.startConstellation = startConstellation = function(opts = {}){
     try {
       const cv = document.getElementById('constellation-cv');
       const wall = document.getElementById('constellation-wall');
@@ -5778,55 +5822,65 @@ function initParticles() {
       if (!ctx) return;
       ctx.setTransform(dpr,0,0,dpr,0,0);
 
-      const items = safeFragments(safeRows());
-      safeSeed = 31 + items.length;
-      if (safeAnimFrame) cancelAnimationFrame(safeAnimFrame);
+      const rows = safeRows();
+      const sig = currentSig(rows);
+      if (sig !== safeItemsSig || opts.force) {
+        safeItemsSig = sig;
+        safeCachedItems = buildConstellationItems(rows);
+        safeStarted = performance.now()/1000;
+      } else if (!safeStarted) {
+        safeStarted = performance.now()/1000;
+      }
 
       const isSmall = W < 760;
-      const cardW = isSmall ? Math.min(W - 38, 620) : Math.min(650, Math.max(390, W * .34));
-      const fontSize = isSmall ? 22 : Math.max(24, Math.min(36, W * .019));
-      const metaSize = isSmall ? 12 : 14;
-      const cols = isSmall ? 1 : Math.max(2, Math.min(3, Math.floor(W / 540)));
-      const usable = W * .86;
-      const left = (W - usable) / 2;
-      const colW = usable / cols;
-      const top = Math.max(118, H * .18);
-      const rowsNeeded = Math.ceil(Math.max(1, items.length) / cols);
-      const gapY = Math.max(96, Math.min(142, (H - top - 85) / Math.max(1, Math.min(rowsNeeded, 6))));
-      const cards = items.map((item, i) => {
-        const col = i % cols;
-        const row = Math.floor(i / cols);
-        const x = Math.max(24 + cardW/2, Math.min(W - 24 - cardW/2, left + col*colW + colW/2 + (safeRand()-.5)*Math.min(130, colW*.26)));
-        const y = Math.min(H - 78, top + (row % 7)*gapY + Math.floor(row/7)*24 + (safeRand()-.5)*34);
-        return Object.assign({}, item, {x,y,w:cardW,h:isSmall?94:110,revealAt:i*.8, drift:safeRand()*Math.PI*2});
-      });
+      const items = safeCachedItems;
+      safeSeed = 733 + items.length + safeFilterSess;
+      if (safeAnimFrame) cancelAnimationFrame(safeAnimFrame);
 
-      function wrap(text, maxW, maxLines){
-        const words = safeText(text).split(/\s+/);
-        const lines = [];
-        let line = '';
-        for (const word of words) {
-          const test = line ? line + ' ' + word : word;
-          if (ctx.measureText(test).width > maxW && line) {
-            lines.push(line);
-            line = word;
-            if (lines.length >= maxLines) break;
-          } else line = test;
+      const placed = [];
+      const centerX = W / 2;
+      const centerY = H / 2;
+      const maxAttempts = 70;
+
+      function pickPosition(w, h, i){
+        for (let a = 0; a < maxAttempts; a++) {
+          const ring = Math.sqrt((i + a + 2) / Math.max(5, items.length + 4));
+          const angle = (i * 2.399963 + a * .71 + safeRand() * .6);
+          const radiusX = W * (.12 + .42 * ring);
+          const radiusY = H * (.10 + .38 * ring);
+          let x = centerX + Math.cos(angle) * radiusX + (safeRand()-.5) * 95;
+          let y = centerY + Math.sin(angle) * radiusY + (safeRand()-.5) * 70;
+          x = Math.max(46, Math.min(W - w - 46, x - w/2));
+          y = Math.max(42, Math.min(H - h - 52, y - h/2));
+          const box = {x,y,w,h};
+          const hit = placed.some(p => !(box.x + box.w + 12 < p.x || p.x + p.w + 12 < box.x || box.y + box.h + 10 < p.y || p.y + p.h + 10 < box.y));
+          if (!hit || a > 45) return box;
         }
-        if (lines.length < maxLines && line) lines.push(line);
-        if (lines.length === maxLines && lines.join(' ').length < safeText(text).length) {
-          lines[maxLines-1] = lines[maxLines-1].replace(/[.,;:]?$/, '') + '...';
-        }
-        return lines;
+        return { x: 60 + safeRand()*(W-260), y: 80 + safeRand()*(H-180), w, h };
       }
+
+      const nodes = items.map((item, i) => {
+        const isWord = item.kind === 'word';
+        const size = isWord
+          ? (isSmall ? 32 : Math.max(34, Math.min(78, 34 * item.weight + safeRand() * 18)))
+          : (isSmall ? 22 : Math.max(24, Math.min(42, 26 + safeRand() * 12)));
+        ctx.font = `${isWord ? 900 : 800} ${size}px "Barlow Condensed", "Bebas Neue", Impact, sans-serif`;
+        const maxW = isWord ? Math.min(520, W*.34) : Math.min(760, W*.44);
+        const lines = isWord ? [item.text] : wrapText(ctx, item.text, maxW, item.text.length > 70 ? 2 : 1);
+        const textW = Math.min(maxW, Math.max(...lines.map(l => measureLine(ctx,l)), 80));
+        const textH = lines.length * (size * 1.02) + (isWord ? 0 : 22);
+        const pos = pickPosition(textW, textH, i);
+        placed.push(pos);
+        return { ...item, ...pos, lines, size, revealAt: i * (isWord ? .42 : .78), drift: safeRand()*Math.PI*2, word: isWord };
+      });
 
       function background(){
         ctx.clearRect(0,0,W,H);
         ctx.fillStyle = '#0D0D0D';
         ctx.fillRect(0,0,W,H);
-        const g = ctx.createRadialGradient(W*.5,H*.45,0,W*.5,H*.45,Math.max(W,H)*.75);
-        g.addColorStop(0,'rgba(184,137,59,.075)');
-        g.addColorStop(.58,'rgba(13,13,13,.30)');
+        const g = ctx.createRadialGradient(W*.5,H*.48,0,W*.5,H*.48,Math.max(W,H)*.78);
+        g.addColorStop(0,'rgba(184,137,59,.08)');
+        g.addColorStop(.52,'rgba(13,13,13,.35)');
         g.addColorStop(1,'rgba(13,13,13,1)');
         ctx.fillStyle = g;
         ctx.fillRect(0,0,W,H);
@@ -5834,9 +5888,9 @@ function initParticles() {
         ctx.lineWidth = 1;
         for (let x=0;x<W;x+=44){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
         for (let y=0;y<H;y+=44){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-        ctx.globalAlpha = .075;
+        ctx.globalAlpha = .07;
         ctx.fillStyle = '#F1EEE7';
-        ctx.font = `900 ${Math.max(46,Math.min(112,W*.075))}px "Bebas Neue", Impact, sans-serif`;
+        ctx.font = `900 ${Math.max(54,Math.min(132,W*.083))}px "Bebas Neue", Impact, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('WHAT WE SAW TODAY', W/2, H/2);
@@ -5850,10 +5904,9 @@ function initParticles() {
 
       function draw(){
         try {
-          const elapsed = performance.now()/1000;
-          const localElapsed = elapsed - started;
+          const elapsed = performance.now()/1000 - safeStarted;
           background();
-          if (!cards.length) {
+          if (!nodes.length) {
             ctx.fillStyle = 'rgba(184,137,59,.78)';
             ctx.font = '900 20px "Barlow Condensed", sans-serif';
             ctx.textAlign = 'center';
@@ -5863,57 +5916,56 @@ function initParticles() {
             return;
           }
 
-          const visible = cards.filter(c => localElapsed >= c.revealAt);
-          visible.forEach((a,i) => visible.slice(i+1,i+5).forEach(b => {
-            const dx=a.x-b.x, dy=a.y-b.y, dist=Math.sqrt(dx*dx+dy*dy);
-            if (dist < Math.min(540,W*.35)) {
+          const visible = nodes.filter(n => elapsed >= n.revealAt);
+          visible.forEach((a,i) => visible.slice(i+1,i+6).forEach(b => {
+            const ax = a.x + a.w/2, ay = a.y + a.h/2;
+            const bx = b.x + b.w/2, by = b.y + b.h/2;
+            const dx=ax-bx, dy=ay-by, dist=Math.sqrt(dx*dx+dy*dy);
+            if (dist < Math.min(430,W*.30)) {
               ctx.beginPath();
-              ctx.strokeStyle = `rgba(184,137,59,${Math.max(0,.11-dist/5200)})`;
-              ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+              ctx.strokeStyle = `rgba(184,137,59,${Math.max(0,.10-dist/5200)})`;
+              ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
             }
           }));
 
-          cards.forEach((c,i) => {
-            const local = localElapsed - c.revealAt;
+          nodes.forEach((n,i) => {
+            const local = elapsed - n.revealAt;
             if (local < 0) return;
-            const ease = Math.min(1, 1 - Math.pow(1 - Math.min(1, local/1.35), 3));
-            const x = c.x - c.w/2 + Math.sin(localElapsed*.18+c.drift)*5;
-            const y = c.y - c.h/2 + Math.cos(localElapsed*.16+c.drift)*4;
-            ctx.globalAlpha = ease;
-            ctx.shadowColor = 'rgba(0,0,0,.55)';
-            ctx.shadowBlur = 18;
-            roundRect(ctx,x,y,c.w,c.h,5);
-            ctx.fillStyle = 'rgba(23,23,23,.85)';
-            ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.strokeStyle = i < 10 ? 'rgba(184,137,59,.68)' : 'rgba(108,108,108,.30)';
-            ctx.stroke();
-            ctx.fillStyle = 'rgba(184,137,59,.9)';
-            ctx.fillRect(x,y,3,c.h);
-            ctx.font = `800 ${fontSize}px "Barlow Condensed", sans-serif`;
+            const ease = Math.min(1, 1 - Math.pow(1 - Math.min(1, local/1.2), 3));
+            const x = n.x + Math.sin(elapsed*.14+n.drift)*4;
+            const y = n.y + Math.cos(elapsed*.12+n.drift)*3;
+            ctx.globalAlpha = ease * (n.word ? .82 : .95);
+            ctx.shadowColor = n.word ? 'rgba(184,137,59,.34)' : 'rgba(0,0,0,.55)';
+            ctx.shadowBlur = n.word ? 16 : 10;
+            ctx.font = `${n.word ? 900 : 800} ${n.size}px "Barlow Condensed", "Bebas Neue", Impact, sans-serif`;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
-            ctx.fillStyle = 'rgba(241,238,231,.94)';
-            wrap(c.text, c.w-46, 2).forEach((line, idx) => ctx.fillText(line, x+22, y+18+idx*(fontSize*1.14)));
-            ctx.font = `900 ${metaSize}px "Barlow Condensed", sans-serif`;
-            ctx.textBaseline = 'bottom';
-            ctx.fillStyle = 'rgba(136,136,136,.86)';
-            const meta = `${(c.name || 'Anonymous').toUpperCase()}${c.category ? ' • ' + c.category.toUpperCase() : ''}`;
-            ctx.fillText(meta.slice(0,80), x+22, y+c.h-14);
+            ctx.fillStyle = n.word ? 'rgba(184,137,59,.88)' : 'rgba(241,238,231,.94)';
+            n.lines.forEach((line, idx) => ctx.fillText(line, x, y + idx*(n.size*1.02)));
+            ctx.shadowBlur = 0;
+            if (!n.word) {
+              ctx.font = `900 12px "Barlow Condensed", sans-serif`;
+              ctx.textBaseline = 'top';
+              ctx.fillStyle = 'rgba(136,136,136,.74)';
+              const meta = `${(n.name || 'Anonymous').toUpperCase()}${n.category ? ' • ' + n.category.toUpperCase() : ''}`;
+              ctx.fillText(meta.slice(0,86), x, y + n.lines.length*(n.size*1.02) + 8);
+            }
             ctx.globalAlpha = 1;
           });
+
+          const visibleCount = Math.min(nodes.length, nodes.filter(n => elapsed >= n.revealAt).length);
           ctx.fillStyle = 'rgba(136,136,136,.72)';
           ctx.font = '900 12px "Barlow Condensed", sans-serif';
           ctx.textAlign = 'right';
           ctx.textBaseline = 'bottom';
-          ctx.fillText(`${Math.min(cards.length, Math.floor(localElapsed/.8)+1)}/${cards.length} HONEST RESPONSES`, W-26, H-24);
+          ctx.fillText(`${visibleCount}/${nodes.length} RAW FRAGMENTS`, W-26, H-24);
+
           if (wall.classList.contains('on')) safeAnimFrame = requestAnimationFrame(draw);
         } catch(e) {
           console.warn('Constellation animation failed safely:', e);
           safeCloseOnly();
         }
       }
-      const started = performance.now()/1000;
       draw();
     } catch(e) {
       console.warn('Constellation failed safely:', e);
@@ -5923,18 +5975,21 @@ function initParticles() {
 
   window.openConstellation = openConstellation = function(opts = {}){
     try {
-      const wall = document.getElementById('constellation-wall');
-      if (!wall) return;
       if (typeof opts.sess !== 'undefined') safeFilterSess = Number(opts.sess) || 0;
-      wall.classList.add('on');
-      // Do not add wall-open. This keeps the constellation isolated from the normal wall layout state.
-      setTimeout(function(){ try { startConstellation(); } catch(e) { safeCloseOnly(); } }, 40);
-      if (!opts.fromBroadcast && typeof isAdmin !== 'undefined' && isAdmin) {
+
+      // Admin should trigger projector only. Do not cover the admin dashboard.
+      if (!opts.fromBroadcast && typeof isAdmin !== 'undefined' && isAdmin && !(typeof isProjector !== 'undefined' && isProjector)) {
         const payload = { sess: safeFilterSess };
         try { payload.responses = safeRows(); } catch(e) { payload.responses = []; }
         try { emitLocalSync('show-constellation', payload); } catch(e) {}
         try { if (realtimeChannel) realtimeChannel.send({ type:'broadcast', event:'show-constellation', payload }); } catch(e) {}
+        return;
       }
+
+      const wall = document.getElementById('constellation-wall');
+      if (!wall) return;
+      wall.classList.add('on');
+      setTimeout(function(){ try { startConstellation({ force:true }); } catch(e) { safeCloseOnly(); } }, 40);
     } catch(e) {
       console.warn('Open constellation failed safely:', e);
       safeCloseOnly();
@@ -5954,10 +6009,9 @@ function initParticles() {
       document.querySelectorAll('.cw-filter').forEach(b => b.classList.remove('on'));
       if (btn) btn.classList.add('on');
       safeFilterSess = parseInt(btn && btn.dataset ? btn.dataset.sess : '0', 10) || 0;
-      startConstellation();
-    } catch(e) {
-      console.warn('Constellation filter failed safely:', e);
-    }
+      safeItemsSig = '';
+      startConstellation({ force:true });
+    } catch(e) { console.warn('Constellation filter failed safely:', e); }
   };
 
   window.projOpenConstellation = projOpenConstellation = function(){ openConstellation({ fromBroadcast: true }); };
