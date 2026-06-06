@@ -555,44 +555,63 @@ body.am #qa-admin-panel { display: block !important; }
 .slide-scaler .sl-complete-btns { gap: 24px !important; }
 .slide-scaler .sl-complete-btns .btn { font-size: 22px !important; padding: 20px 40px !important; }
 
-/* Projector stage — fills entire viewport */
-body.projector-mode #ssl {
+/* ═══════════════════════════════════════════════════
+   PROJECTOR MODE — clean fullscreen 1920×1080
+   #ssl becomes a fixed fullscreen black canvas.
+   .ss-stage fills it completely.
+   slide-scaler is centered via transform (set by JS).
+   ═══════════════════════════════════════════════════ */
+body.projector-mode .ss-hdr,
+body.projector-mode .ss-arrow,
+body.projector-mode .ss-dots,
+body.projector-mode .ss-prog-bar,
+body.projector-mode .presenter-bar,
+body.projector-mode .slide-note-wrap,
+body.projector-mode #sc,
+body.projector-mode .hub-hdr,
+body.projector-mode .welcome-banner,
+body.projector-mode .admin-dot { display: none !important; }
+
+/* The slideshow overlay fills the whole screen */
+body.projector-mode #ssl,
+body.projector-mode #ssl.on {
   display: flex !important;
+  flex-direction: column !important;
   position: fixed !important;
-  inset: 0 !important;
+  top: 0 !important; left: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
   background: #000 !important;
-  flex-direction: column !important;
   z-index: 9999 !important;
+  overflow: hidden !important;
 }
-body.projector-mode .ss-hdr { display: none !important; }
-body.projector-mode .ss-stage,
-:fullscreen .ss-stage,
-:-webkit-full-screen .ss-stage {
-  position: fixed !important;
-  inset: 0 !important;
+
+/* Stage fills 100% of ssl — no padding, no 16:9 trick */
+body.projector-mode .ss-stage {
+  position: absolute !important;
+  top: 0 !important; left: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
   padding: 0 !important;
   background: #000 !important;
-  flex: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  cursor: default !important;
 }
-/* Kill the 16:9 padding trick — in projector mode we use true viewport */
+
+/* Kill the 16:9 padding-top spacer */
 body.projector-mode .ss-stage::before,
-:fullscreen .ss-stage::before,
-:-webkit-full-screen .ss-stage::before {
-  display: none !important;
-  padding-top: 0 !important;
+body.projector-mode .ss-stage::after { display: none !important; }
+
+/* Fullscreen button press (non-projector) */
+:fullscreen .ss-hdr, :-webkit-full-screen .ss-hdr { display: none !important; }
+:fullscreen .ss-stage, :-webkit-full-screen .ss-stage {
+  position: absolute !important; top: 0 !important; left: 0 !important;
+  width: 100vw !important; height: 100vh !important; padding: 0 !important;
 }
-
-body.projector-mode .ss-arrow,
-body.projector-mode .ss-dots,
-body.projector-mode .ss-prog-bar,
-body.projector-mode .presenter-bar { display: none !important; }
-
-:fullscreen .ss-hdr,
-:-webkit-full-screen .ss-hdr { display: none !important; }
+:fullscreen .ss-stage::before, :-webkit-full-screen .ss-stage::before { display: none !important; }
 
 /* COVER */
 .sl-cover { position: relative; background: var(--bgd); border: 1px solid var(--ln); justify-content: center; align-items: center; min-height: clamp(300px,60vw,620px); }
@@ -2024,6 +2043,7 @@ body.am .qa-bank-btn { display: flex; }
       <button onclick="_startProjectorStandalone()" style="background:var(--gold);border:none;color:#0D0D0D;font-family:var(--fc);font-size:clamp(.6rem,1vw,.78rem);font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:14px 32px;cursor:pointer">&#9654; START MANUALLY</button>
       <button onclick="projectorToggleFS()" style="background:transparent;border:1px solid rgba(184,137,59,.4);color:var(--gold);font-family:var(--fc);font-size:clamp(.6rem,1vw,.78rem);font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:14px 32px;cursor:pointer">&#9974; FULLSCREEN</button>
     </div>
+  </div>
 </div>
 
 <!-- ═══ IN-SLIDE ANSWER DRAWER ═══ -->
@@ -2256,12 +2276,13 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
 let curSess = 0, curSlide = 0;
+let isProjector = false; // declared here so DOMContentLoaded can set it before renderSlide runs
 
 // ── BOOT ──
 document.addEventListener('DOMContentLoaded', () => {
@@ -2277,7 +2298,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // restore session
   // Check projector mode immediately — show waiting screen right away, Supabase is optional
   if (new URLSearchParams(window.location.search).has('projector')) {
+    // Wipe any stale session state immediately — projector always starts fresh
+    try {
+      localStorage.removeItem('bbb_resume');
+      localStorage.removeItem('bbb_u');
+    } catch(e) {}
     document.body.classList.add('projector-mode');
+    isProjector = true; // set immediately — before buildSlides/renderSlide runs
     document.getElementById('projector-wait').classList.remove('hidden');
     initProjectorQR();
     initRealtimeSync(); // attempt realtime if Supabase configured
@@ -2300,7 +2327,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable) return;
     // Also skip if drawer is open
     if (document.getElementById('answer-drawer').classList.contains('open')) return;
-    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+    if (e.key === 'ArrowRight' || e.key === ' ') {
+      e.preventDefault();
+      const slide = SESSIONS[curSess]?.slides[curSlide];
+      // On sc_complete, ArrowRight jumps to the next session
+      if (slide && slide.t === 'sc_complete' && slide.nextSess !== undefined) {
+        openSS(slide.nextSess);
+      } else {
+        nextSlide();
+      }
+    }
     if (e.key === 'ArrowLeft') prevSlide();
     if (e.key === 'Escape') { if (document.fullscreenElement) document.exitFullscreen(); else closeSlideshow(); }
   });
@@ -2625,21 +2661,24 @@ let sessTimerStart = null;
 let sessTimerInterval = null;
 
 // ── 1920×1080 SLIDE SCALER ──
-function initSlideScaler() {
-  scaleSlides();
-}
+// Always use window dimensions in projector/fullscreen — never clientWidth/Height
+// which can be 0 or wrong before the browser has painted the fixed layout.
 function scaleSlides() {
-  const stage = document.querySelector('.ss-stage');
-  if (!stage) return;
-  // In projector/fullscreen mode the stage is position:fixed inset:0, so
-  // always use the actual viewport — clientWidth/Height can be 0 before paint.
   const isProj = document.body.classList.contains('projector-mode') || !!document.fullscreenElement;
-  const stageW = isProj ? window.innerWidth  : (stage.clientWidth  || window.innerWidth);
-  const stageH = isProj ? window.innerHeight : (stage.clientHeight || window.innerHeight);
-  if (!stageW || !stageH) return;
-  const scale = Math.min(stageW / 1920, stageH / 1080);
-  document.querySelectorAll('.slide-scaler').forEach(scaler => {
-    scaler.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  let W, H;
+  if (isProj) {
+    W = window.innerWidth;
+    H = window.innerHeight;
+  } else {
+    const stage = document.querySelector('.ss-stage');
+    if (!stage) return;
+    W = stage.clientWidth;
+    H = stage.clientHeight;
+    if (!W || !H) return;
+  }
+  const scale = Math.min(W / 1920, H / 1080);
+  document.querySelectorAll('.slide-scaler').forEach(el => {
+    el.style.transform = `translate(-50%, -50%) scale(${scale})`;
   });
 }
 window.addEventListener('resize', scaleSlides);
@@ -2659,11 +2698,8 @@ function openSS(i) {
   document.getElementById('sh').classList.remove('on');
   document.getElementById('ssl').classList.add('on');
   goTo(0);
-  requestAnimationFrame(() => {
-    scaleSlides();
-    setTimeout(scaleSlides, 100);
-    setTimeout(scaleSlides, 350);
-  });
+  // Scale after slides are in DOM — rAF ensures paint has happened
+  requestAnimationFrame(() => { scaleSlides(); setTimeout(scaleSlides, 150); });
   document.body.style.overflow = 'hidden';
   // Show wall button for admin
   const wb = document.getElementById('wall-btn');
@@ -2761,7 +2797,7 @@ function renderSlide(s, i) {
       <div class="sl-complete-icon">&#10003;</div>
       <div class="sl-complete-title">Session ${s.nextSess} of 4 Complete</div>
       <div class="sl-complete-sub">Take a moment. What landed? What do you want to carry into the next session?</div>
-      <div class="sl-complete-btns">
+      <div class="sl-complete-btns" style="display:${isProjector ? 'none' : 'flex'}">
         <button class="btn btn-gold" onclick="event.stopPropagation();openSS(${s.nextSess})">Continue to Session ${s.nextSess + 1}: ${s.nextName} &rarr;</button>
         <button class="btn btn-outline" onclick="event.stopPropagation();closeSlideshow()">Go to Workbook</button>
       </div>
@@ -2820,8 +2856,10 @@ function goTo(i) {
     notesEl.textContent = note;
     notesEl.style.display = note ? 'block' : 'none';
   }
-  // Save resume point
-  try { localStorage.setItem('bbb_resume', JSON.stringify({sess: curSess, slide: i})); } catch(e) {}
+  // Save resume point (not in projector mode — projector follows presenter)
+  if (!isProjector) {
+    try { localStorage.setItem('bbb_resume', JSON.stringify({sess: curSess, slide: i})); } catch(e) {}
+  }
   // Broadcast to projector
   broadcastSlide(curSess, i);
   // Update admin dashboard if open
@@ -2892,19 +2930,15 @@ const NOTES = {
 // REALTIME SLIDE SYNC (Supabase Realtime)
 // ══════════════════════════════════════════════════════
 let realtimeChannel = null;
-let isProjector = false;
 let projectorConnected = false;
 
 function initRealtimeSync() {
   if (!window.SB_URL || !window.SB_KEY) {
-    console.warn('BBB: Supabase not configured — falling back to standalone projector mode');
-    // No Supabase: just open session 0 directly so the projector isn't stuck
+    console.warn('BBB: Supabase not configured — standalone projector mode');
     _startProjectorStandalone();
     return;
   }
-
   isProjector = new URLSearchParams(window.location.search).has('projector');
-
   if (isProjector) {
     initProjectorMode();
   } else if (isAdmin) {
@@ -2912,17 +2946,18 @@ function initRealtimeSync() {
   }
 }
 
-// Standalone projector: no Supabase — open session 0 immediately
+// No Supabase — open session 0 and go full standalone
 function _startProjectorStandalone() {
+  // isProjector must already be true (set at boot) before renderSlide is called
   const wait = document.getElementById('projector-wait');
   if (wait) wait.classList.add('hidden');
+  try { localStorage.removeItem('bbb_resume'); } catch(e) {}
+  curSess = 0; curSlide = 0;
   openSS(0);
-  // Re-run scaleSlides after DOM settles to guarantee correct sizing
-  requestAnimationFrame(() => {
-    scaleSlides();
-    setTimeout(scaleSlides, 100);
-    setTimeout(scaleSlides, 400);
-  });
+  // scaleSlides again after a real paint cycle — projector CSS may not have settled yet
+  setTimeout(scaleSlides, 50);
+  setTimeout(scaleSlides, 200);
+  setTimeout(scaleSlides, 500);
 }
 
 // ── PROJECTOR MODE ──
@@ -2980,21 +3015,11 @@ function initProjectorMode() {
 function handleProjectorSlideChange(payload) {
   const { sess, slide } = payload;
   if (sess === undefined || slide === undefined) return;
-
-  // Hide wait screen, show slideshow
   const wait = document.getElementById('projector-wait');
-  if (wait && !wait.classList.contains('hidden')) {
-    wait.classList.add('hidden');
-  }
-
-  // Open the right session if needed
+  if (wait && !wait.classList.contains('hidden')) wait.classList.add('hidden');
   if (!document.getElementById('ssl').classList.contains('on') || curSess !== sess) {
     openSS(sess);
-    setTimeout(() => {
-      goTo(slide);
-      scaleSlides();
-      setTimeout(scaleSlides, 100);
-    }, 100);
+    setTimeout(() => { goTo(slide); setTimeout(scaleSlides, 50); }, 120);
   } else {
     goTo(slide);
     requestAnimationFrame(scaleSlides);
