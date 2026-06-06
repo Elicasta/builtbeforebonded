@@ -625,13 +625,20 @@ body.projector-mode .ss-stage::after { display: none !important; }
   position: fixed;
   bottom: 0; left: 0; right: 0;
   z-index: 10000;
-  background: rgba(13,13,13,.85);
+  background: rgba(13,13,13,.92);
   border-top: 1px solid rgba(184,137,59,.25);
   backdrop-filter: blur(8px);
   padding: 8px 20px;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  transition: opacity .4s ease, transform .4s ease;
+}
+body.projector-mode .proj-ctrl-bar { display: flex; }
+body.projector-mode .proj-ctrl-bar.hidden-bar {
+  opacity: 0;
+  transform: translateY(100%);
+  pointer-events: none;
 }
 body.projector-mode .proj-ctrl-bar { display: flex; }
 .proj-ctrl-btn {
@@ -2022,8 +2029,8 @@ body.am .qa-bank-btn { display: flex; }
   <div class="proj-ctrl-right">
     <button class="proj-ctrl-btn" onclick="prevSlide()">&#8592; PREV</button>
     <button class="proj-ctrl-btn" onclick="nextSlide()">NEXT &#8594;</button>
-    <button class="proj-ctrl-btn" onclick="openWall()">&#9641; RESPONSE WALL</button>
-    <button class="proj-ctrl-btn" onclick="openQAWall()">&#9998; Q&amp;A WALL</button>
+    <button class="proj-ctrl-btn" onclick="projOpenWall()">&#9641; RESPONSE WALL</button>
+    <button class="proj-ctrl-btn" onclick="projOpenQAWall()">&#9998; Q&amp;A WALL</button>
     <button class="proj-ctrl-btn" onclick="projectorToggleFS()">&#9974; FULLSCREEN</button>
   </div>
 </div>
@@ -2042,7 +2049,7 @@ body.am .qa-bank-btn { display: flex; }
     </div>
   </div>
   <div class="rw-body"><div class="rw-grid" id="rw-grid"><div class="rw-empty">No responses yet. Responses will appear as attendees submit their workbooks.</div></div></div>
-  <div class="wall-close-strip"><button class="btn btn-outline" onclick="closeWall()" style="width:100%;justify-content:center">&#10005; Close Wall</button></div>
+  <div class="wall-close-strip"><button class="btn btn-outline" onclick="isProjector ? projCloseWall() : closeWall()" style="width:100%;justify-content:center">&#10005; Close Wall</button></div>
 </div>
 
 
@@ -2159,7 +2166,7 @@ body.am .qa-bank-btn { display: flex; }
       <div class="qa-empty">No questions yet. Attendees can submit using the Ask a Question button.</div>
     </div>
   </div>
-  <div class="wall-close-strip"><button class="btn btn-outline" onclick="closeQAWall()" style="width:100%;justify-content:center">&#10005; Close Q&amp;A</button></div>
+  <div class="wall-close-strip"><button class="btn btn-outline" onclick="isProjector ? projCloseQAWall() : closeQAWall()" style="width:100%;justify-content:center">&#10005; Close Q&amp;A</button></div>
 </div>
 
 <!-- ═══ ADMIN DASHBOARD ═══ -->
@@ -2346,8 +2353,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2923,6 +2930,8 @@ function goTo(i) {
     const sessTag = SESSIONS[curSess] ? SESSIONS[curSess].tag : '';
     projInfo.textContent = `${sessTag} \u00b7 SLIDE ${i+1} / ${count}`;
   }
+  // Flash the projector control bar briefly on slide change
+  if (window._projShowBar) window._projShowBar();
   document.getElementById('ss-prog').style.width = `${(i+1)/count*100}%`;
   if (liveData.length) updateSlideFeed(liveData);
   // Show presenter notes if admin
@@ -3023,18 +3032,18 @@ function initRealtimeSync() {
   }
 }
 
-// No Supabase — open session 0 and go full standalone
+// Called by START MANUALLY button — hides wait screen and opens slides
 function _startProjectorStandalone() {
-  // isProjector must already be true (set at boot) before renderSlide is called
   const wait = document.getElementById('projector-wait');
   if (wait) wait.classList.add('hidden');
   try { localStorage.removeItem('bbb_resume'); } catch(e) {}
   curSess = 0; curSlide = 0;
   openSS(0);
-  // scaleSlides again after a real paint cycle — projector CSS may not have settled yet
   setTimeout(scaleSlides, 50);
   setTimeout(scaleSlides, 200);
   setTimeout(scaleSlides, 500);
+  // Start the control bar auto-hide
+  initProjCtrlBar();
 }
 
 // ── PROJECTOR MODE ──
@@ -3094,6 +3103,8 @@ function handleProjectorSlideChange(payload) {
   if (sess === undefined || slide === undefined) return;
   const wait = document.getElementById('projector-wait');
   if (wait && !wait.classList.contains('hidden')) wait.classList.add('hidden');
+  // Start control bar auto-hide on first slide change
+  if (!window._projCtrlBarInited) initProjCtrlBar();
   if (!document.getElementById('ssl').classList.contains('on') || curSess !== sess) {
     openSS(sess);
     setTimeout(() => { goTo(slide); setTimeout(scaleSlides, 50); }, 120);
@@ -3114,6 +3125,48 @@ function setProjectorStatus(connected) {
     if (dot) dot.classList.remove('connected');
     if (txt) txt.textContent = 'Presenter disconnected — waiting...';
   }
+}
+
+// ── PROJECTOR CONTROL BAR AUTO-HIDE ──
+// Shows on mouse move, hides after 4s of inactivity
+function initProjCtrlBar() {
+  if (window._projCtrlBarInited) return;
+  window._projCtrlBarInited = true;
+  const bar = document.getElementById('proj-ctrl-bar');
+  if (!bar) return;
+  let hideTimer = null;
+  function showBar() {
+    bar.classList.remove('hidden-bar');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => bar.classList.add('hidden-bar'), 4000);
+  }
+  // Show immediately, then hide after 4s
+  showBar();
+  document.addEventListener('mousemove', showBar);
+  document.addEventListener('touchstart', showBar, { passive: true });
+  // Also show briefly whenever slide changes
+  window._projShowBar = showBar;
+}
+
+// ── PROJECTOR WALL OVERRIDES ──
+// In projector mode the walls are triggered locally (no Supabase needed)
+// The admin tab sends a broadcast; if no Supabase the projector uses its own buttons.
+// These wrappers ensure the wall opens/closes on this screen directly.
+function projOpenWall() {
+  document.getElementById('response-wall').classList.add('on');
+  const allBtn = document.querySelector('.rw-filter[data-sess="0"]');
+  if (allBtn) { document.querySelectorAll('.rw-filter').forEach(b => b.classList.remove('on')); allBtn.classList.add('on'); }
+  renderWall();
+}
+function projCloseWall() {
+  document.getElementById('response-wall').classList.remove('on');
+}
+function projOpenQAWall() {
+  document.getElementById('qa-wall').classList.add('on');
+  renderQACards();
+}
+function projCloseQAWall() {
+  document.getElementById('qa-wall').classList.remove('on');
 }
 
 // ── PRESENTER BROADCAST ──
