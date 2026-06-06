@@ -585,10 +585,10 @@ body.projector-mode .hub-hdr,
 body.projector-mode .welcome-banner,
 body.projector-mode .admin-dot { display: none !important; }
 
-/* The slideshow overlay fills the whole screen */
-body.projector-mode #ssl,
-body.projector-mode #ssl.on {
-  display: flex !important;
+/* The slideshow overlay fills the whole screen, but only after a slide is active.
+   Projector wait must stay visible until presenter sends the first slide. */
+body.projector-mode #ssl {
+  display: none !important;
   flex-direction: column !important;
   position: fixed !important;
   top: 0 !important; left: 0 !important;
@@ -597,6 +597,9 @@ body.projector-mode #ssl.on {
   background: #000 !important;
   z-index: 9999 !important;
   overflow: hidden !important;
+}
+body.projector-mode #ssl.on {
+  display: flex !important;
 }
 
 /* Stage fills 100% of ssl — no padding, no 16:9 trick */
@@ -1041,6 +1044,18 @@ body.named .slide-note-wrap { display: block; }
 /* ── Q&A WALL (constellation style) ── */
 #qa-wall { position: fixed; inset: 0; z-index: 3000; background: #0D0D0D; display: none; flex-direction: column; }
 #qa-wall.on { display: flex; }
+
+/* Projector temporary overlays.
+   These sit above the active slide, then close back to that same slide. */
+body.projector-mode #response-wall.on,
+body.projector-mode #qa-wall.on {
+  z-index: 10050 !important;
+}
+body.projector-mode.wall-open .proj-ctrl-bar {
+  opacity: 0 !important;
+  transform: translateY(100%) !important;
+  pointer-events: none !important;
+}
 .qa-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid #2A2A2A; background: #171717; flex-shrink: 0; }
 .qa-title { font-family: 'Bebas Neue', Impact, sans-serif; font-size: 1.4rem; color: #F1EEE7; letter-spacing: .04em; text-transform: uppercase; }
 .qa-title span { color: #B8893B; }
@@ -2146,10 +2161,10 @@ body.am .qa-bank-btn { display: flex; }
 <!-- ═══ Q&A WALL ═══ -->
 <div id="qa-wall">
   <div class="qa-header">
-    <div class="qa-title">Q&amp;A <span>Questions</span></div>
+    <div class="qa-title">Questions <span>+ Answers</span></div>
     <div class="qa-controls">
       <span style="font-family:var(--fc);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)" id="qa-count-label">0 questions</span>
-      <button class="ss-btn" onclick="closeQAWall()">&#10005; Close</button>
+      <button class="ss-btn" onclick="isProjector ? projCloseQAWall() : closeQAWall()">&#10005; Close</button>
     </div>
   </div>
   <div class="qa-body">
@@ -2353,8 +2368,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2374,7 +2389,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(drawFoundation, 60000);
   // restore session
   // Check projector mode immediately — show waiting screen right away, Supabase is optional
-  if (new URLSearchParams(window.location.search).has('projector')) {
+  if (new URLSearchParams(window.location.search).has('projector') || window.location.pathname.includes('projector')) {
     // Wipe any stale session state immediately — projector always starts fresh
     try {
       localStorage.removeItem('bbb_resume');
@@ -3083,8 +3098,13 @@ function initProjectorMode() {
         openWall();
       })
       .on('broadcast', { event: 'close-wall' }, () => {
-        document.getElementById('response-wall').classList.remove('on');
-        document.getElementById('constellation-wall').classList.remove('on');
+        closeWall();
+      })
+      .on('broadcast', { event: 'show-qa-wall' }, ({ payload }) => {
+        receiveQAWallPayload(payload || {});
+      })
+      .on('broadcast', { event: 'close-qa-wall' }, () => {
+        closeQAWall({ fromBroadcast: true });
       })
       .subscribe(status => {
         if (status === 'SUBSCRIBED') {
@@ -3153,20 +3173,17 @@ function initProjCtrlBar() {
 // The admin tab sends a broadcast; if no Supabase the projector uses its own buttons.
 // These wrappers ensure the wall opens/closes on this screen directly.
 function projOpenWall() {
-  document.getElementById('response-wall').classList.add('on');
-  const allBtn = document.querySelector('.rw-filter[data-sess="0"]');
-  if (allBtn) { document.querySelectorAll('.rw-filter').forEach(b => b.classList.remove('on')); allBtn.classList.add('on'); }
-  renderWall();
+  openWall();
 }
 function projCloseWall() {
-  document.getElementById('response-wall').classList.remove('on');
+  closeWall();
 }
 function projOpenQAWall() {
-  document.getElementById('qa-wall').classList.add('on');
-  renderQACards();
+  // Local projector control. Does not broadcast back.
+  openQAWall({ fromBroadcast: true });
 }
 function projCloseQAWall() {
-  document.getElementById('qa-wall').classList.remove('on');
+  closeQAWall({ fromBroadcast: true });
 }
 
 // ── PRESENTER BROADCAST ──
@@ -3367,8 +3384,7 @@ function initAttendeeFollow() {
         openWall();
       })
       .on('broadcast', { event: 'close-wall' }, () => {
-        document.getElementById('response-wall').classList.remove('on');
-        document.getElementById('constellation-wall').classList.remove('on');
+        closeWall();
       })
       .on('broadcast', { event: 'presenter-connected' }, () => {
         attendeeFollowing = true;
@@ -3645,12 +3661,48 @@ document.addEventListener('click', e => {
 });
 
 // ── Q&A WALL ──
-function openQAWall() {
+function openQAWall(opts = {}) {
   loadQuestions();
-  document.getElementById('qa-wall').classList.add('on');
+  rememberWallReturnState();
+  document.body.classList.add('wall-open');
+  const wall = document.getElementById('qa-wall');
+  if (wall) wall.classList.add('on');
+  renderQACards();
+  updateQABadge();
+
+  // Broadcast the current question bank to the projector.
+  // The projector receives a snapshot so it does not need shared localStorage.
+  if (isAdmin && realtimeChannel && !opts.fromBroadcast) {
+    realtimeChannel.send({
+      type: 'broadcast',
+      event: 'show-qa-wall',
+      payload: { questions: questions || [], featuredQId: featuredQId || null }
+    });
+  }
 }
-function closeQAWall() {
-  document.getElementById('qa-wall').classList.remove('on');
+function closeQAWall(opts = {}) {
+  const wall = document.getElementById('qa-wall');
+  if (wall) wall.classList.remove('on');
+  restoreWallReturnState();
+
+  if (isAdmin && realtimeChannel && !opts.fromBroadcast) {
+    realtimeChannel.send({ type: 'broadcast', event: 'close-qa-wall', payload: {} });
+  }
+}
+function receiveQAWallPayload(payload = {}) {
+  if (Array.isArray(payload.questions)) {
+    questions = payload.questions;
+    try { localStorage.setItem('bbb_qs', JSON.stringify(questions)); } catch(e) {}
+  } else {
+    loadQuestions();
+  }
+  if (payload.featuredQId !== undefined) featuredQId = payload.featuredQId;
+  rememberWallReturnState();
+  document.body.classList.add('wall-open');
+  const wall = document.getElementById('qa-wall');
+  if (wall) wall.classList.add('on');
+  renderQACards();
+  updateQABadge();
 }
 
 function loadQuestions() {
@@ -4665,7 +4717,22 @@ function updateDayProgress() {
 }
 // ── RESPONSE WALL ──
 let wallFilter = 0;
+let wallReturnState = null;
+function rememberWallReturnState() {
+  wallReturnState = { sess: curSess, slide: curSlide, wasOpen: document.getElementById('ssl').classList.contains('on') };
+}
+function restoreWallReturnState() {
+  document.body.classList.remove('wall-open');
+  if (!wallReturnState || !wallReturnState.wasOpen) return;
+  const ssl = document.getElementById('ssl');
+  if (ssl && !ssl.classList.contains('on')) ssl.classList.add('on');
+  curSess = wallReturnState.sess;
+  goTo(wallReturnState.slide);
+  requestAnimationFrame(() => { scaleSlides(); setTimeout(scaleSlides, 80); });
+}
 function openWall() {
+  rememberWallReturnState();
+  document.body.classList.add('wall-open');
   document.getElementById('response-wall').classList.add('on');
   // Auto-select current session if slideshow is open
   if (document.getElementById('ssl').classList.contains('on') && curSess >= 0) {
@@ -4684,6 +4751,7 @@ function openWall() {
 }
 function closeWall() {
   document.getElementById('response-wall').classList.remove('on');
+  restoreWallReturnState();
   // Broadcast close to projector
   if (isAdmin && realtimeChannel) {
     realtimeChannel.send({ type: 'broadcast', event: 'close-wall', payload: {} });
