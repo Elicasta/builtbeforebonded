@@ -2372,8 +2372,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -3849,9 +3849,35 @@ function qaEscapeHtml(value) {
 function qaFindById(id) {
   return questions.find(x => String(x.id) === String(id));
 }
+function qaQuestionFromElement(el) {
+  const card = el ? el.closest('[data-qid]') : null;
+  const id = card && card.dataset ? card.dataset.qid : (el && el.dataset ? el.dataset.qid : null);
+  let q = id !== null && id !== undefined ? qaFindById(id) : null;
+  if (q) return q;
+
+  // Fallback: build the question directly from the clicked DOM card.
+  // This avoids stale id/index issues across admin, mobile, and projector builds.
+  if (card) {
+    const textEl = card.querySelector('.qa-card-text, .adm-qa-text');
+    const metaEl = card.querySelector('.qa-card-meta, .adm-qa-meta');
+    const text = textEl ? textEl.textContent.trim() : '';
+    const meta = metaEl ? metaEl.textContent.trim() : '';
+    const name = (meta.split('·')[0] || 'Anonymous').trim();
+    if (text) {
+      return {
+        id: id || ('dom-' + Date.now()),
+        text,
+        name: name || 'Anonymous',
+        anonymous: /^anonymous$/i.test(name || ''),
+        ts: ''
+      };
+    }
+  }
+  return null;
+}
 function qaFeatureFromElement(el) {
-  const id = el && el.dataset ? el.dataset.qid : null;
-  if (id !== null && id !== undefined) featureQuestion(id);
+  const q = qaQuestionFromElement(el);
+  if (q) featureQuestionPayload(q);
 }
 function qaHideFromElement(el) {
   const id = el && el.dataset ? el.dataset.qid : null;
@@ -3933,32 +3959,40 @@ function featureQuestion(id) {
     q = qaFindById(qid);
   }
   if (!q) return;
+  featureQuestionPayload(q);
+}
+
+function featureQuestionPayload(q) {
+  if (!q || !q.text) return;
+
   featuredQId = q.id;
+  try { localStorage.setItem('bbb_featured_qid', String(featuredQId)); } catch(e) {}
 
   updateQAWallFeaturedDisplay(q);
-
-  // Re-render cards to highlight featured
   renderQACards();
   playTone('slide');
 
-  // Broadcast to projector if connected. Include the full question bank so the
-  // projector can update the wall even when it is running in a separate tab.
-  if (isAdmin) {
-    const payload = {
-      id: q.id,
-      featuredQId: q.id,
-      text: q.text,
-      name: q.anonymous ? 'Anonymous' : (q.name || 'Anonymous'),
-      anonymous: !!q.anonymous,
-      questions: questions || []
-    };
-    emitLocalSync('feature-question', payload);
+  const payload = {
+    id: q.id,
+    featuredQId: q.id,
+    text: q.text,
+    name: q.anonymous ? 'Anonymous' : (q.name || 'Anonymous'),
+    anonymous: !!q.anonymous,
+    ts: q.ts || '',
+    questions: questions || []
+  };
+
+  // Broadcast from any admin surface that has a Feature button. Do not gate this
+  // behind isAdmin, because mobile/admin preview routes may not set that flag
+  // consistently even though they show the controls.
+  emitLocalSync('feature-question', payload);
+  try {
     if (realtimeChannel) realtimeChannel.send({
       type: 'broadcast',
       event: 'feature-question',
       payload
     });
-  }
+  } catch(e) {}
 }
 
 function showFeaturedQuestionOverlay(q = {}) {
@@ -4004,12 +4038,18 @@ function handleFeaturedQuestion(payload = {}) {
     }
   } catch(e) {}
 
-  const q = questions.find(x => String(x.id) === String(featuredQId)) || {
+  const q = (payload && payload.text) ? {
+    id: payload.id || featuredQId,
+    text: payload.text,
+    name: payload.name || 'Anonymous',
+    anonymous: !!payload.anonymous || payload.name === 'Anonymous',
+    ts: payload.ts || ''
+  } : (questions.find(x => String(x.id) === String(featuredQId)) || {
     id: payload.id,
     text: payload.text,
     name: payload.name || 'Anonymous',
     anonymous: payload.anonymous || payload.name === 'Anonymous'
-  };
+  });
 
   if (isProjector) {
     showFeaturedQuestionOverlay(q);
@@ -4576,8 +4616,8 @@ function admRenderQA() {
 }
 
 function admFeatureFromElement(el) {
-  const id = el && el.dataset ? el.dataset.qid : null;
-  if (id !== null && id !== undefined) admFeature(id);
+  const q = qaQuestionFromElement(el);
+  if (q) admFeatureQuestion(q);
 }
 function admHideQFromElement(el) {
   const id = el && el.dataset ? el.dataset.qid : null;
@@ -4585,8 +4625,11 @@ function admHideQFromElement(el) {
 }
 
 function admFeature(id) {
-  featureQuestion(id);
   const q = qaFindById(id);
+  if (q) admFeatureQuestion(q);
+}
+function admFeatureQuestion(q) {
+  featureQuestionPayload(q);
   const display = document.getElementById('adm-featured-display');
   const text = document.getElementById('adm-featured-text');
   if (display) display.classList.add('show');
