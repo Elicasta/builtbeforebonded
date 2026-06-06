@@ -557,9 +557,14 @@ body.am #qa-admin-panel { display: block !important; }
 
 /* Projector stage — fills entire viewport */
 body.projector-mode #ssl {
+  display: flex !important;
   position: fixed !important;
   inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
   background: #000 !important;
+  flex-direction: column !important;
+  z-index: 9999 !important;
 }
 body.projector-mode .ss-hdr { display: none !important; }
 body.projector-mode .ss-stage,
@@ -571,10 +576,15 @@ body.projector-mode .ss-stage,
   height: 100vh !important;
   padding: 0 !important;
   background: #000 !important;
+  flex: none !important;
 }
+/* Kill the 16:9 padding trick — in projector mode we use true viewport */
 body.projector-mode .ss-stage::before,
 :fullscreen .ss-stage::before,
-:-webkit-full-screen .ss-stage::before { display: none !important; }
+:-webkit-full-screen .ss-stage::before {
+  display: none !important;
+  padding-top: 0 !important;
+}
 
 body.projector-mode .ss-arrow,
 body.projector-mode .ss-dots,
@@ -2010,7 +2020,10 @@ body.am .qa-bank-btn { display: flex; }
       </div>
     </div>
     <div style="font-family:var(--fc);font-size:clamp(.5rem,.85vw,.64rem);letter-spacing:.1em;text-transform:uppercase;color:rgba(184,137,59,.35);margin-top:28px">Relationships do not create your foundation. They reveal it.</div>
-  </div>
+    <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <button onclick="_startProjectorStandalone()" style="background:var(--gold);border:none;color:#0D0D0D;font-family:var(--fc);font-size:clamp(.6rem,1vw,.78rem);font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:14px 32px;cursor:pointer">&#9654; START MANUALLY</button>
+      <button onclick="projectorToggleFS()" style="background:transparent;border:1px solid rgba(184,137,59,.4);color:var(--gold);font-family:var(--fc);font-size:clamp(.6rem,1vw,.78rem);font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:14px 32px;cursor:pointer">&#9974; FULLSCREEN</button>
+    </div>
 </div>
 
 <!-- ═══ IN-SLIDE ANSWER DRAWER ═══ -->
@@ -2243,8 +2256,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2618,8 +2631,11 @@ function initSlideScaler() {
 function scaleSlides() {
   const stage = document.querySelector('.ss-stage');
   if (!stage) return;
-  const stageW = stage.clientWidth || window.innerWidth;
-  const stageH = stage.clientHeight || window.innerHeight;
+  // In projector/fullscreen mode the stage is position:fixed inset:0, so
+  // always use the actual viewport — clientWidth/Height can be 0 before paint.
+  const isProj = document.body.classList.contains('projector-mode') || !!document.fullscreenElement;
+  const stageW = isProj ? window.innerWidth  : (stage.clientWidth  || window.innerWidth);
+  const stageH = isProj ? window.innerHeight : (stage.clientHeight || window.innerHeight);
   if (!stageW || !stageH) return;
   const scale = Math.min(stageW / 1920, stageH / 1080);
   document.querySelectorAll('.slide-scaler').forEach(scaler => {
@@ -2628,6 +2644,8 @@ function scaleSlides() {
 }
 window.addEventListener('resize', scaleSlides);
 document.addEventListener('fullscreenchange', () => setTimeout(scaleSlides, 50));
+document.addEventListener('webkitfullscreenchange', () => setTimeout(scaleSlides, 50));
+window.addEventListener('orientationchange', () => setTimeout(scaleSlides, 300));
 
 function openSS(i) {
   curSess = i; curSlide = 0;
@@ -2641,7 +2659,11 @@ function openSS(i) {
   document.getElementById('sh').classList.remove('on');
   document.getElementById('ssl').classList.add('on');
   goTo(0);
-  requestAnimationFrame(() => scaleSlides());
+  requestAnimationFrame(() => {
+    scaleSlides();
+    setTimeout(scaleSlides, 100);
+    setTimeout(scaleSlides, 350);
+  });
   document.body.style.overflow = 'hidden';
   // Show wall button for admin
   const wb = document.getElementById('wall-btn');
@@ -2875,7 +2897,9 @@ let projectorConnected = false;
 
 function initRealtimeSync() {
   if (!window.SB_URL || !window.SB_KEY) {
-    console.warn('BBB: Supabase not configured — realtime sync disabled');
+    console.warn('BBB: Supabase not configured — falling back to standalone projector mode');
+    // No Supabase: just open session 0 directly so the projector isn't stuck
+    _startProjectorStandalone();
     return;
   }
 
@@ -2886,6 +2910,19 @@ function initRealtimeSync() {
   } else if (isAdmin) {
     initPresenterBroadcast();
   }
+}
+
+// Standalone projector: no Supabase — open session 0 immediately
+function _startProjectorStandalone() {
+  const wait = document.getElementById('projector-wait');
+  if (wait) wait.classList.add('hidden');
+  openSS(0);
+  // Re-run scaleSlides after DOM settles to guarantee correct sizing
+  requestAnimationFrame(() => {
+    scaleSlides();
+    setTimeout(scaleSlides, 100);
+    setTimeout(scaleSlides, 400);
+  });
 }
 
 // ── PROJECTOR MODE ──
@@ -2953,9 +2990,14 @@ function handleProjectorSlideChange(payload) {
   // Open the right session if needed
   if (!document.getElementById('ssl').classList.contains('on') || curSess !== sess) {
     openSS(sess);
-    setTimeout(() => goTo(slide), 100);
+    setTimeout(() => {
+      goTo(slide);
+      scaleSlides();
+      setTimeout(scaleSlides, 100);
+    }, 100);
   } else {
     goTo(slide);
+    requestAnimationFrame(scaleSlides);
   }
 }
 
