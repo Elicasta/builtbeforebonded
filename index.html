@@ -2372,11 +2372,11 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
-let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
+let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null, questionTimer = null;
 let curSess = 0, curSlide = 0;
 let isProjector = false; // declared here so DOMContentLoaded can set it before renderSlide runs
 
@@ -2403,6 +2403,7 @@ document.addEventListener('DOMContentLoaded', () => {
     isProjector = true; // set immediately — before buildSlides/renderSlide runs
     document.getElementById('projector-wait').classList.remove('hidden');
     initProjectorQR();
+    startQuestionPoll();
     initRealtimeSync(); // attempt realtime if Supabase configured
   } else {
     if (localStorage.getItem('bbb_u') === '1') {
@@ -2511,6 +2512,7 @@ function activateAdmin() {
   document.body.classList.add('am');
   document.getElementById('admin-btn').textContent = 'Admin ✓';
   startLivePoll();
+  startQuestionPoll();
   setTimeout(initRealtimeSync, 500);
   setTimeout(showAdminHub, 200);
 }
@@ -2528,6 +2530,7 @@ function showHub() {
   document.getElementById('ssl').classList.remove('on');
   // Start following presenter (for non-admin attendees)
   if (!isAdmin && !isProjector) setTimeout(initAttendeeFollow, 800);
+  startQuestionPoll();
 }
 function scrollTo2(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
 function scrollToWB(i) {
@@ -2654,6 +2657,14 @@ function startLivePoll() {
     pollQuestions();
   }, 4000);
 }
+
+function startQuestionPoll() {
+  if (!window.SB_URL || !window.SB_KEY) return;
+  if (questionTimer) return;
+  pollQuestions();
+  questionTimer = setInterval(pollQuestions, 2500);
+}
+
 function updateSlideFeed(data) {
   const f = document.getElementById('sl-live-feed'); if (!f) return;
   const sess = parseInt(f.dataset.sess), cat = f.dataset.cat;
@@ -3029,6 +3040,7 @@ const NOTES = {
 // REALTIME SLIDE SYNC (Supabase Realtime)
 // ══════════════════════════════════════════════════════
 let realtimeChannel = null;
+let universalChannel = null;
 let projectorConnected = false;
 const BBB_TAB_ID = 'tab_' + Math.random().toString(36).slice(2) + Date.now();
 let bbbBus = null;
@@ -3093,7 +3105,62 @@ function handleLocalSyncEvent(message = {}) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', initLocalSync);
+document.addEventListener('DOMContentLoaded', () => {
+  initLocalSync();
+  initUniversalRealtimeSync();
+});
+
+
+function sendRealtimeEvent(event, payload = {}) {
+  emitLocalSync(event, payload);
+  const msg = { type: 'broadcast', event, payload };
+  try { if (realtimeChannel) realtimeChannel.send(msg); } catch(e) {}
+  try { if (universalChannel && universalChannel !== realtimeChannel) universalChannel.send(msg); } catch(e) {}
+}
+
+function initUniversalRealtimeSync() {
+  if (!window.SB_URL || !window.SB_KEY || universalChannel) return;
+  loadSupabaseClient(() => {
+    const client = window._sbClient;
+    if (!client || universalChannel) return;
+
+    const channel = client.channel('bbb-control', {
+      config: { broadcast: { self: false } }
+    });
+
+    channel
+      .on('broadcast', { event: 'feature-question' }, ({ payload }) => {
+        handleFeaturedQuestion(payload || {});
+      })
+      .on('broadcast', { event: 'dismiss-question' }, () => {
+        const ov = document.getElementById('feat-q-overlay');
+        if (ov) ov.remove();
+      })
+      .on('broadcast', { event: 'show-qa-wall' }, ({ payload }) => {
+        receiveQAWallPayload(payload || {});
+      })
+      .on('broadcast', { event: 'close-qa-wall' }, () => {
+        closeQAWall({ fromBroadcast: true });
+      })
+      .on('broadcast', { event: 'show-wall' }, () => {
+        openWall({ fromBroadcast: true });
+      })
+      .on('broadcast', { event: 'close-wall' }, () => {
+        closeWall({ fromBroadcast: true });
+      })
+      .on('broadcast', { event: 'projector-home' }, () => {
+        if (isProjector) showProjectorHome();
+      })
+      .on('broadcast', { event: 'slide-change' }, ({ payload }) => {
+        if (isProjector) handleProjectorSlideChange(payload || {});
+      })
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED') {
+          universalChannel = channel;
+        }
+      });
+  });
+}
 
 function initRealtimeSync() {
   if (!window.SB_URL || !window.SB_KEY) {
@@ -3231,7 +3298,7 @@ function showProjectorHome() {
 
 function adminGoHome() {
   emitLocalSync('projector-home', {});
-  if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'projector-home', payload: {} });
+  sendRealtimeEvent('projector-home', {});
   const ssl = document.getElementById('ssl');
   if (ssl) ssl.classList.remove('on');
   document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
@@ -3792,12 +3859,7 @@ function openQAWall(opts = {}) {
   // The projector receives a snapshot so it does not need shared localStorage.
   if (isAdmin && !opts.fromBroadcast) {
     const payload = { questions: questions || [], featuredQId: featuredQId || null };
-    emitLocalSync('show-qa-wall', payload);
-    if (realtimeChannel) realtimeChannel.send({
-      type: 'broadcast',
-      event: 'show-qa-wall',
-      payload
-    });
+    sendRealtimeEvent('show-qa-wall', payload);
   }
 }
 function closeQAWall(opts = {}) {
@@ -3806,8 +3868,7 @@ function closeQAWall(opts = {}) {
   restoreWallReturnState();
 
   if (isAdmin && !opts.fromBroadcast) {
-    emitLocalSync('close-qa-wall', {});
-    if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'close-qa-wall', payload: {} });
+    sendRealtimeEvent('close-qa-wall', {});
   }
 }
 function receiveQAWallPayload(payload = {}) {
@@ -3947,6 +4008,29 @@ function updateQAWallFeaturedDisplay(questionLike) {
   }
 }
 
+
+async function persistFeaturedQuestionToDB(q) {
+  // Best-effort DB state. If the Supabase table does not have a `featured`
+  // column, these PATCH calls fail silently and Realtime broadcast still works.
+  if (!q || !window.SB_URL || !window.SB_KEY) return;
+  const headers = {
+    'Content-Type': 'application/json',
+    'apikey': window.SB_KEY,
+    'Authorization': 'Bearer ' + window.SB_KEY,
+    'Prefer': 'return=minimal'
+  };
+  try {
+    await fetch(window.SB_URL + '/rest/v1/questions?featured=is.true', {
+      method: 'PATCH', headers, body: JSON.stringify({ featured: false })
+    });
+  } catch(e) {}
+  try {
+    await fetch(window.SB_URL + '/rest/v1/questions?id=eq.' + encodeURIComponent(q.id), {
+      method: 'PATCH', headers, body: JSON.stringify({ featured: true })
+    });
+  } catch(e) {}
+}
+
 function featureQuestion(id) {
   const qid = String(id);
   let q = qaFindById(qid);
@@ -3957,6 +4041,7 @@ function featureQuestion(id) {
   if (!q) return;
   featuredQId = q.id;
   try { localStorage.setItem('bbb_featured_qid', String(featuredQId)); } catch(e) {}
+  persistFeaturedQuestionToDB(q).catch(() => {});
 
   updateQAWallFeaturedDisplay(q);
 
@@ -3975,12 +4060,7 @@ function featureQuestion(id) {
       anonymous: !!q.anonymous,
       questions: questions || []
     };
-    emitLocalSync('feature-question', payload);
-    if (realtimeChannel) realtimeChannel.send({
-      type: 'broadcast',
-      event: 'feature-question',
-      payload
-    });
+    sendRealtimeEvent('feature-question', payload);
   }
 }
 
@@ -4041,7 +4121,7 @@ function updateQABadge() {
 
 // Poll for new questions from Supabase
 async function pollQuestions() {
-  if (!window.SB_URL || !window.SB_KEY || !isAdmin) return;
+  if (!window.SB_URL || !window.SB_KEY) return;
   try {
     const r = await fetch(window.SB_URL + '/rest/v1/questions?order=submitted_at.asc&limit=100', {
       headers: { 'apikey': window.SB_KEY, 'Authorization': 'Bearer ' + window.SB_KEY }
@@ -4053,18 +4133,24 @@ async function pollQuestions() {
       text: q.question,
       name: q.anonymous ? 'Anonymous' : (q.name || 'Attendee'),
       anonymous: q.anonymous,
-      featured: false,
+      featured: !!q.featured,
       ts: new Date(q.submitted_at).toLocaleTimeString()
     }));
-    const oldSig = questions.map(q => `${q.id}:${q.text}`).join('|');
-    const newSig = nextQuestions.map(q => `${q.id}:${q.text}`).join('|');
-    if (oldSig === newSig) return;
+    const dbFeatured = nextQuestions.find(q => q.featured);
+    if (dbFeatured) featuredQId = dbFeatured.id;
+    const oldSig = questions.map(q => `${q.id}:${q.text}:${!!q.featured}`).join('|') + `|featured:${featuredQId || ''}`;
+    const newSig = nextQuestions.map(q => `${q.id}:${q.text}:${!!q.featured}`).join('|') + `|featured:${dbFeatured ? dbFeatured.id : (featuredQId || '')}`;
+    if (oldSig === newSig) {
+      updateQAWallFeaturedDisplay();
+      if (document.getElementById('qa-wall') && document.getElementById('qa-wall').classList.contains('on')) renderQACards();
+      return;
+    }
     questions = nextQuestions;
     try { localStorage.setItem('bbb_qs', JSON.stringify(questions)); } catch(e) {}
     updateQABadge();
     renderQALiveFeed();
     admRenderQA();
-    if (document.getElementById('qa-wall').classList.contains('on')) renderQACards();
+    if (document.getElementById('qa-wall') && document.getElementById('qa-wall').classList.contains('on')) { updateQAWallFeaturedDisplay(); renderQACards(); }
   } catch(e) {}
 }
 
@@ -4407,7 +4493,7 @@ function killFeaturedQuestion() {
   const ov = document.getElementById('feat-q-overlay');
   if (ov) ov.remove();
   // Broadcast dismiss to projector and attendees
-  if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'dismiss-question', payload: {} });
+  sendRealtimeEvent('dismiss-question', {});
 }
 
 function confirmResetSession() {
@@ -4984,8 +5070,7 @@ function openWall(opts = {}) {
   renderWall();
   // Broadcast to projector and attendees
   if (isAdmin && !opts.fromBroadcast) {
-    emitLocalSync('show-wall', {});
-    if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'show-wall', payload: {} });
+    sendRealtimeEvent('show-wall', {});
   }
 }
 function closeWall(opts = {}) {
@@ -4993,8 +5078,7 @@ function closeWall(opts = {}) {
   restoreWallReturnState();
   // Broadcast close to projector
   if (isAdmin && !opts.fromBroadcast) {
-    emitLocalSync('close-wall', {});
-    if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'close-wall', payload: {} });
+    sendRealtimeEvent('close-wall', {});
   }
 }
 function filterWall(btn) {
