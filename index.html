@@ -618,6 +618,49 @@ body.projector-mode .ss-stage {
 body.projector-mode .ss-stage::before,
 body.projector-mode .ss-stage::after { display: none !important; }
 
+/* ── PROJECTOR CONTROL BAR ── */
+/* Slim bar fixed at bottom of screen in projector mode — walls + nav */
+.proj-ctrl-bar {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 10000;
+  background: rgba(13,13,13,.85);
+  border-top: 1px solid rgba(184,137,59,.25);
+  backdrop-filter: blur(8px);
+  padding: 8px 20px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+body.projector-mode .proj-ctrl-bar { display: flex; }
+.proj-ctrl-btn {
+  background: rgba(30,30,30,.9);
+  border: 1px solid rgba(184,137,59,.3);
+  color: var(--gold);
+  font-family: var(--fc);
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.proj-ctrl-btn:hover { background: rgba(184,137,59,.15); border-color: var(--gold); }
+.proj-ctrl-btn.danger { color: var(--rl); border-color: rgba(155,69,39,.4); }
+.proj-ctrl-left { display: flex; gap: 6px; align-items: center; }
+.proj-ctrl-right { display: flex; gap: 6px; align-items: center; }
+.proj-slide-info {
+  font-family: var(--fc);
+  font-size: .6rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--mu);
+  padding: 0 8px;
+}
+
 /* Fullscreen button press (non-projector) */
 :fullscreen .ss-hdr, :-webkit-full-screen .ss-hdr { display: none !important; }
 :fullscreen .ss-stage, :-webkit-full-screen .ss-stage {
@@ -1971,6 +2014,20 @@ body.am .qa-bank-btn { display: flex; }
   </div>
 </div>
 
+<!-- ═══ PROJECTOR CONTROL BAR (only visible in projector mode) ═══ -->
+<div class="proj-ctrl-bar" id="proj-ctrl-bar">
+  <div class="proj-ctrl-left">
+    <span class="proj-slide-info" id="proj-slide-info">SESSION 1 &middot; SLIDE 1</span>
+  </div>
+  <div class="proj-ctrl-right">
+    <button class="proj-ctrl-btn" onclick="prevSlide()">&#8592; PREV</button>
+    <button class="proj-ctrl-btn" onclick="nextSlide()">NEXT &#8594;</button>
+    <button class="proj-ctrl-btn" onclick="openWall()">&#9641; RESPONSE WALL</button>
+    <button class="proj-ctrl-btn" onclick="openQAWall()">&#9998; Q&amp;A WALL</button>
+    <button class="proj-ctrl-btn" onclick="projectorToggleFS()">&#9974; FULLSCREEN</button>
+  </div>
+</div>
+
 <!-- ═══ RESPONSE WALL ═══ -->
 <div id="response-wall">
   <div class="rw-header">
@@ -2289,8 +2346,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2860,6 +2917,12 @@ function goTo(i) {
   document.querySelectorAll('.ss-dot').forEach((d, j) => d.classList.toggle('on', j === i));
   curSlide = i;
   document.getElementById('ss-pt').textContent = `${i+1} / ${count}`;
+  // Update projector control bar info
+  const projInfo = document.getElementById('proj-slide-info');
+  if (projInfo) {
+    const sessTag = SESSIONS[curSess] ? SESSIONS[curSess].tag : '';
+    projInfo.textContent = `${sessTag} \u00b7 SLIDE ${i+1} / ${count}`;
+  }
   document.getElementById('ss-prog').style.width = `${(i+1)/count*100}%`;
   if (liveData.length) updateSlideFeed(liveData);
   // Show presenter notes if admin
@@ -2947,8 +3010,9 @@ let projectorConnected = false;
 
 function initRealtimeSync() {
   if (!window.SB_URL || !window.SB_KEY) {
-    console.warn('BBB: Supabase not configured — standalone projector mode');
-    _startProjectorStandalone();
+    // No Supabase — stay on wait screen so presenter can click START MANUALLY
+    // (The wait screen already has the START MANUALLY button)
+    console.warn('BBB: Supabase not configured — standalone projector mode. Use START MANUALLY.');
     return;
   }
   isProjector = new URLSearchParams(window.location.search).has('projector');
