@@ -849,7 +849,7 @@ body.am #ssl .presenter-bar { display: block; }
 .qr-url { font-family: var(--fc); font-size: .72rem; color: var(--gold); letter-spacing: .08em; }
 
 /* ── CONSTELLATION / WORD CLOUD ── */
-#constellation-wall { position: fixed; inset: 0; z-index: 3000; background: #0D0D0D; display: none; flex-direction: column; overflow: hidden; }
+#constellation-wall { position: fixed; inset: 0; z-index: 10080; background: #0D0D0D; display: none; flex-direction: column; overflow: hidden; }
 #constellation-wall.on { display: flex; }
 .cw-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid #2A2A2A; background: #171717; flex-shrink: 0; }
 .cw-title { font-family: 'Bebas Neue', Impact, sans-serif; font-size: 1.4rem; color: #F1EEE7; letter-spacing: .04em; text-transform: uppercase; }
@@ -895,9 +895,7 @@ body.projector-mode .sound-toggle { display: none !important; }
 body.projector-mode #sh { background: var(--bg); }
 
 
-/* Constellation disabled */
-#constellation-wall { display: none !important; }
-.adm-tool-btn[onclick*="openConstellation"] { display: none !important; }
+/* Constellation enabled as a fail-safe optional layer. */
 #const-btn { display: none !important; }
 .projector-wait { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 10070; }
 .projector-wait.hidden { display: none; }
@@ -2049,6 +2047,7 @@ body.am .qa-bank-btn { display: flex; }
     <button class="proj-ctrl-btn" onclick="nextSlide()">NEXT &#8594;</button>
     <button class="proj-ctrl-btn" onclick="projOpenWall()">&#9641; RESPONSE WALL</button>
     <button class="proj-ctrl-btn" onclick="projOpenQAWall()">&#9998; Q&amp;A WALL</button>
+    <button class="proj-ctrl-btn" onclick="projOpenConstellation()">&#10022; STARS</button>
     <button class="proj-ctrl-btn" onclick="projectorToggleFS()">&#9974; FULLSCREEN</button>
   </div>
 </div>
@@ -2074,13 +2073,12 @@ body.am .qa-bank-btn { display: flex; }
 <!-- ═══ CONSTELLATION WALL ═══ -->
 <div id="constellation-wall">
   <div class="cw-header">
-    <div class="cw-title">Response <span>Constellation</span></div>
+    <div class="cw-title">What We <span>Saw Today</span></div>
     <div class="cw-controls">
-      <button class="cw-filter on" data-sess="0" onclick="cwFilter(this)">All</button>
+      <button class="cw-filter on" data-sess="0" onclick="cwFilter(this)">Sessions 1-3</button>
       <button class="cw-filter" data-sess="1" onclick="cwFilter(this)">Session 1</button>
       <button class="cw-filter" data-sess="2" onclick="cwFilter(this)">Session 2</button>
       <button class="cw-filter" data-sess="3" onclick="cwFilter(this)">Session 3</button>
-      <button class="cw-filter" data-sess="4" onclick="cwFilter(this)">Session 4</button>
       <button class="ss-btn" onclick="closeConstellation()">&#10005; Close</button>
     </div>
   </div>
@@ -2372,8 +2370,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -3090,6 +3088,18 @@ function handleLocalSyncEvent(message = {}) {
     if (isProjector) closeQAWall({ fromBroadcast: true });
     return;
   }
+  if (event === 'show-constellation') {
+    if (isProjector) {
+      try { openConstellation({ fromBroadcast: true, sess: payload.sess || 0 }); } catch(e) {}
+    }
+    return;
+  }
+  if (event === 'close-constellation') {
+    if (isProjector) {
+      try { closeConstellation({ fromBroadcast: true }); } catch(e) {}
+    }
+    return;
+  }
   if (event === 'feature-question') {
     if (isProjector) handleFeaturedQuestion(payload);
     return;
@@ -3178,6 +3188,12 @@ function initProjectorMode() {
       })
       .on('broadcast', { event: 'close-qa-wall' }, () => {
         closeQAWall({ fromBroadcast: true });
+      })
+      .on('broadcast', { event: 'show-constellation' }, ({ payload }) => {
+        try { openConstellation({ fromBroadcast: true, sess: payload && payload.sess ? payload.sess : 0 }); } catch(e) {}
+      })
+      .on('broadcast', { event: 'close-constellation' }, () => {
+        try { closeConstellation({ fromBroadcast: true }); } catch(e) {}
       })
       .on('broadcast', { event: 'projector-home' }, () => {
         showProjectorHome();
@@ -5636,6 +5652,319 @@ function initParticles() {
   }
   draw();
 }
+// ══════════════════════════════════════════════════════
+// FAIL-SAFE CONSTELLATION OVERRIDE
+// Constellation is intentionally non-critical. If it errors, it closes itself
+// and leaves slides, response wall, Q&A overlay, and projector state untouched.
+// ══════════════════════════════════════════════════════
+(function(){
+  let safeAnimFrame = null;
+  let safeFilterSess = 0;
+  let safeSeed = 13;
+
+  function safeRand(){
+    safeSeed = (safeSeed * 1664525 + 1013904223) % 4294967296;
+    return safeSeed / 4294967296;
+  }
+
+  function safeNormalize(row){
+    try {
+      return typeof normalizeResponseRow === 'function' ? normalizeResponseRow(row || {}) : (row || {});
+    } catch(e) { return row || {}; }
+  }
+
+  function safeRows(){
+    try {
+      let source = [];
+      try {
+        if (Array.isArray(liveData) && liveData.length) source = liveData;
+      } catch(e) {}
+      if (!source.length) {
+        try { source = getLocalResponses() || []; } catch(e) { source = []; }
+      }
+      let rows = source.map(safeNormalize).filter(r => {
+        const txt = String((r && (r.response || r.text || r.answer || r.content || r.message || r.value)) || '').trim();
+        return txt.length > 0;
+      });
+      const allowed = [1,2,3];
+      rows = rows.filter(r => {
+        const sess = Number(r && r.session);
+        if (safeFilterSess > 0) return sess === safeFilterSess;
+        return allowed.includes(sess);
+      });
+      return rows;
+    } catch(e) {
+      console.warn('Constellation rows failed safely:', e);
+      return [];
+    }
+  }
+
+  function safeText(v){
+    return String(v || '').replace(/\s+/g,' ').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").trim();
+  }
+
+  function safeFragments(rows){
+    const seen = new Set();
+    const fragments = [];
+    try {
+      rows.forEach((r, idx) => {
+        const raw = safeText(r.response || r.text || r.answer || r.content || r.message || r.value);
+        if (!raw) return;
+        const parts = raw.length <= 135 ? [raw] : raw.split(/(?<=[.!?])\s+|\n+/).map(safeText).filter(Boolean);
+        parts.forEach(part => {
+          let t = safeText(part);
+          if (t.length < 3) return;
+          if (t.length > 150) t = t.slice(0, 147).trim() + '...';
+          const key = t.toLowerCase();
+          if (seen.has(key)) return;
+          seen.add(key);
+          fragments.push({
+            text: t,
+            name: safeText(r.name) || (r.anonymous ? 'Anonymous' : 'Attendee'),
+            category: safeText(r.category),
+            session: Number(r.session) || 0,
+            idx
+          });
+        });
+      });
+    } catch(e) {
+      console.warn('Constellation fragment build failed safely:', e);
+    }
+    return fragments.slice(0, 48);
+  }
+
+  function roundRect(ctx,x,y,w,h,r){
+    try {
+      const rr = Math.min(r,w/2,h/2);
+      ctx.beginPath();
+      ctx.moveTo(x+rr,y);
+      ctx.arcTo(x+w,y,x+w,y+h,rr);
+      ctx.arcTo(x+w,y+h,x,y+h,rr);
+      ctx.arcTo(x,y+h,x,y,rr);
+      ctx.arcTo(x,y,x+w,y,rr);
+      ctx.closePath();
+    } catch(e) {
+      ctx.rect(x,y,w,h);
+    }
+  }
+
+  function safeCloseOnly(){
+    try {
+      const wall = document.getElementById('constellation-wall');
+      if (wall) wall.classList.remove('on');
+      document.body.classList.remove('wall-open');
+      if (safeAnimFrame) cancelAnimationFrame(safeAnimFrame);
+      safeAnimFrame = null;
+    } catch(e) {}
+  }
+
+  window.startConstellation = startConstellation = function(){
+    try {
+      const cv = document.getElementById('constellation-cv');
+      const wall = document.getElementById('constellation-wall');
+      if (!cv || !wall || !wall.classList.contains('on')) return;
+
+      const header = wall.querySelector('.cw-header');
+      const hH = header ? header.getBoundingClientRect().height : 64;
+      const W = Math.max(320, Math.floor(window.innerWidth || wall.clientWidth || 1280));
+      const H = Math.max(320, Math.floor((window.innerHeight || wall.clientHeight || 720) - hH));
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = Math.floor(W * dpr);
+      cv.height = Math.floor(H * dpr);
+      cv.style.width = W + 'px';
+      cv.style.height = H + 'px';
+
+      const ctx = cv.getContext('2d');
+      if (!ctx) return;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+
+      const items = safeFragments(safeRows());
+      safeSeed = 31 + items.length;
+      if (safeAnimFrame) cancelAnimationFrame(safeAnimFrame);
+
+      const isSmall = W < 760;
+      const cardW = isSmall ? Math.min(W - 38, 620) : Math.min(650, Math.max(390, W * .34));
+      const fontSize = isSmall ? 22 : Math.max(24, Math.min(36, W * .019));
+      const metaSize = isSmall ? 12 : 14;
+      const cols = isSmall ? 1 : Math.max(2, Math.min(3, Math.floor(W / 540)));
+      const usable = W * .86;
+      const left = (W - usable) / 2;
+      const colW = usable / cols;
+      const top = Math.max(118, H * .18);
+      const rowsNeeded = Math.ceil(Math.max(1, items.length) / cols);
+      const gapY = Math.max(96, Math.min(142, (H - top - 85) / Math.max(1, Math.min(rowsNeeded, 6))));
+      const cards = items.map((item, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x = Math.max(24 + cardW/2, Math.min(W - 24 - cardW/2, left + col*colW + colW/2 + (safeRand()-.5)*Math.min(130, colW*.26)));
+        const y = Math.min(H - 78, top + (row % 7)*gapY + Math.floor(row/7)*24 + (safeRand()-.5)*34);
+        return Object.assign({}, item, {x,y,w:cardW,h:isSmall?94:110,revealAt:i*.8, drift:safeRand()*Math.PI*2});
+      });
+
+      function wrap(text, maxW, maxLines){
+        const words = safeText(text).split(/\s+/);
+        const lines = [];
+        let line = '';
+        for (const word of words) {
+          const test = line ? line + ' ' + word : word;
+          if (ctx.measureText(test).width > maxW && line) {
+            lines.push(line);
+            line = word;
+            if (lines.length >= maxLines) break;
+          } else line = test;
+        }
+        if (lines.length < maxLines && line) lines.push(line);
+        if (lines.length === maxLines && lines.join(' ').length < safeText(text).length) {
+          lines[maxLines-1] = lines[maxLines-1].replace(/[.,;:]?$/, '') + '...';
+        }
+        return lines;
+      }
+
+      function background(){
+        ctx.clearRect(0,0,W,H);
+        ctx.fillStyle = '#0D0D0D';
+        ctx.fillRect(0,0,W,H);
+        const g = ctx.createRadialGradient(W*.5,H*.45,0,W*.5,H*.45,Math.max(W,H)*.75);
+        g.addColorStop(0,'rgba(184,137,59,.075)');
+        g.addColorStop(.58,'rgba(13,13,13,.30)');
+        g.addColorStop(1,'rgba(13,13,13,1)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0,0,W,H);
+        ctx.strokeStyle = 'rgba(108,108,108,.075)';
+        ctx.lineWidth = 1;
+        for (let x=0;x<W;x+=44){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+        for (let y=0;y<H;y+=44){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+        ctx.globalAlpha = .075;
+        ctx.fillStyle = '#F1EEE7';
+        ctx.font = `900 ${Math.max(46,Math.min(112,W*.075))}px "Bebas Neue", Impact, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('WHAT WE SAW TODAY', W/2, H/2);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = 'rgba(184,137,59,.82)';
+        ctx.font = '900 14px "Barlow Condensed", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText('SESSIONS 1–3 • RAW THOUGHTS • HONEST FEELINGS', W/2, Math.max(30,H*.065));
+      }
+
+      function draw(){
+        try {
+          const elapsed = performance.now()/1000;
+          const localElapsed = elapsed - started;
+          background();
+          if (!cards.length) {
+            ctx.fillStyle = 'rgba(184,137,59,.78)';
+            ctx.font = '900 20px "Barlow Condensed", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('WAITING FOR HONEST RESPONSES...', W/2, H/2);
+            if (wall.classList.contains('on')) safeAnimFrame = requestAnimationFrame(draw);
+            return;
+          }
+
+          const visible = cards.filter(c => localElapsed >= c.revealAt);
+          visible.forEach((a,i) => visible.slice(i+1,i+5).forEach(b => {
+            const dx=a.x-b.x, dy=a.y-b.y, dist=Math.sqrt(dx*dx+dy*dy);
+            if (dist < Math.min(540,W*.35)) {
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(184,137,59,${Math.max(0,.11-dist/5200)})`;
+              ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+            }
+          }));
+
+          cards.forEach((c,i) => {
+            const local = localElapsed - c.revealAt;
+            if (local < 0) return;
+            const ease = Math.min(1, 1 - Math.pow(1 - Math.min(1, local/1.35), 3));
+            const x = c.x - c.w/2 + Math.sin(localElapsed*.18+c.drift)*5;
+            const y = c.y - c.h/2 + Math.cos(localElapsed*.16+c.drift)*4;
+            ctx.globalAlpha = ease;
+            ctx.shadowColor = 'rgba(0,0,0,.55)';
+            ctx.shadowBlur = 18;
+            roundRect(ctx,x,y,c.w,c.h,5);
+            ctx.fillStyle = 'rgba(23,23,23,.85)';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = i < 10 ? 'rgba(184,137,59,.68)' : 'rgba(108,108,108,.30)';
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(184,137,59,.9)';
+            ctx.fillRect(x,y,3,c.h);
+            ctx.font = `800 ${fontSize}px "Barlow Condensed", sans-serif`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = 'rgba(241,238,231,.94)';
+            wrap(c.text, c.w-46, 2).forEach((line, idx) => ctx.fillText(line, x+22, y+18+idx*(fontSize*1.14)));
+            ctx.font = `900 ${metaSize}px "Barlow Condensed", sans-serif`;
+            ctx.textBaseline = 'bottom';
+            ctx.fillStyle = 'rgba(136,136,136,.86)';
+            const meta = `${(c.name || 'Anonymous').toUpperCase()}${c.category ? ' • ' + c.category.toUpperCase() : ''}`;
+            ctx.fillText(meta.slice(0,80), x+22, y+c.h-14);
+            ctx.globalAlpha = 1;
+          });
+          ctx.fillStyle = 'rgba(136,136,136,.72)';
+          ctx.font = '900 12px "Barlow Condensed", sans-serif';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(`${Math.min(cards.length, Math.floor(localElapsed/.8)+1)}/${cards.length} HONEST RESPONSES`, W-26, H-24);
+          if (wall.classList.contains('on')) safeAnimFrame = requestAnimationFrame(draw);
+        } catch(e) {
+          console.warn('Constellation animation failed safely:', e);
+          safeCloseOnly();
+        }
+      }
+      const started = performance.now()/1000;
+      draw();
+    } catch(e) {
+      console.warn('Constellation failed safely:', e);
+      safeCloseOnly();
+    }
+  };
+
+  window.openConstellation = openConstellation = function(opts = {}){
+    try {
+      const wall = document.getElementById('constellation-wall');
+      if (!wall) return;
+      if (typeof opts.sess !== 'undefined') safeFilterSess = Number(opts.sess) || 0;
+      wall.classList.add('on');
+      // Do not add wall-open. This keeps the constellation isolated from the normal wall layout state.
+      setTimeout(function(){ try { startConstellation(); } catch(e) { safeCloseOnly(); } }, 40);
+      if (!opts.fromBroadcast && typeof isAdmin !== 'undefined' && isAdmin) {
+        const payload = { sess: safeFilterSess };
+        try { payload.responses = safeRows(); } catch(e) { payload.responses = []; }
+        try { emitLocalSync('show-constellation', payload); } catch(e) {}
+        try { if (realtimeChannel) realtimeChannel.send({ type:'broadcast', event:'show-constellation', payload }); } catch(e) {}
+      }
+    } catch(e) {
+      console.warn('Open constellation failed safely:', e);
+      safeCloseOnly();
+    }
+  };
+
+  window.closeConstellation = closeConstellation = function(opts = {}){
+    safeCloseOnly();
+    if (!opts.fromBroadcast && typeof isAdmin !== 'undefined' && isAdmin) {
+      try { emitLocalSync('close-constellation', {}); } catch(e) {}
+      try { if (realtimeChannel) realtimeChannel.send({ type:'broadcast', event:'close-constellation', payload:{} }); } catch(e) {}
+    }
+  };
+
+  window.cwFilter = cwFilter = function(btn){
+    try {
+      document.querySelectorAll('.cw-filter').forEach(b => b.classList.remove('on'));
+      if (btn) btn.classList.add('on');
+      safeFilterSess = parseInt(btn && btn.dataset ? btn.dataset.sess : '0', 10) || 0;
+      startConstellation();
+    } catch(e) {
+      console.warn('Constellation filter failed safely:', e);
+    }
+  };
+
+  window.projOpenConstellation = projOpenConstellation = function(){ openConstellation({ fromBroadcast: true }); };
+  window.projCloseConstellation = projCloseConstellation = function(){ closeConstellation({ fromBroadcast: true }); };
+})();
+
+
 // Unregister any service worker — it causes stale caching on redeployment
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(regs => {
