@@ -257,7 +257,7 @@ body.am #qa-admin-panel { display: block !important; }
 .ss-btn { background: var(--bgc); border: 1px solid var(--ln); color: var(--mu); font-family: var(--fc); font-size: .66rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; padding: 6px 10px; cursor: pointer; transition: all .2s; white-space: nowrap; }
 .ss-btn:hover { color: var(--gold); border-color: var(--gold); }
 /* stage */
-.ss-stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: clamp(16px,3vw,50px) 0 clamp(12px,2vw,32px); position: relative; overflow: hidden; cursor: pointer; background: var(--bg); }
+.ss-stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: clamp(16px,3vw,50px) 0 clamp(12px,2vw,32px); position: relative; overflow: hidden; cursor: pointer; background: var(--bg); min-height: 320px; }
 .ss-stage::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(108,108,108,.02) 1px, transparent 1px), linear-gradient(90deg, rgba(108,108,108,.02) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
 .ss-prog-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--gold); transition: width .4s ease; z-index: 5; }
 .ss-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 5; }
@@ -418,135 +418,152 @@ body.am #qa-admin-panel { display: block !important; }
   z-index: 0;
 }
 @keyframes breathe { 0%, 100% { opacity: .5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
-/* ══════════════════════════════════════
-   FULLSCREEN + PROJECTOR — SCALE TO FIT
-   Match the tab proportions but bigger.
-   Key insight: constrain content width,
-   scale fonts relative to a 1400px base.
-   ══════════════════════════════════════ */
-
-/* When browser is in fullscreen (F11 or admin fullscreen button) */
-:fullscreen #ssl,
-:-webkit-full-screen #ssl {
-  background: #000;
-}
-:fullscreen .ss-hdr,
-:-webkit-full-screen .ss-hdr { display: none !important; }
-:fullscreen .ss-stage,
-:-webkit-full-screen .ss-stage {
-  padding: 0 !important;
-  height: 100vh !important;
-  background: #000 !important;
-}
-:fullscreen .slide,
-:-webkit-full-screen .slide {
-  max-width: 1400px !important;
-  width: 100% !important;
-  min-height: unset !important;
-  height: 100vh !important;
-  border: none !important;
-  margin: 0 auto !important;
-}
-/* Teaching — fullscreen */
-:fullscreen .sl-te,
-:-webkit-full-screen .sl-te { padding: 60px 100px !important; }
-:fullscreen .sl-te-hl,
-:-webkit-full-screen .sl-te-hl { font-size: clamp(32px, 3.8vw, 64px) !important; max-width: 100% !important; }
-:fullscreen .sl-pts,
-:-webkit-full-screen .sl-pts { max-width: 100% !important; }
-:fullscreen .sl-pts li,
-:-webkit-full-screen .sl-pts li { font-size: clamp(16px, 1.6vw, 26px) !important; padding: 10px 0 !important; }
-/* Scripture — fullscreen */
-:fullscreen .sl-sc,
-:-webkit-full-screen .sl-sc { padding: 60px 100px !important; }
-:fullscreen .sl-sc-text,
-:-webkit-full-screen .sl-sc-text { font-size: clamp(18px, 2vw, 32px) !important; max-width: 100% !important; }
-:fullscreen .sl-sc-tk,
-:-webkit-full-screen .sl-sc-tk { font-size: clamp(22px, 2.6vw, 40px) !important; max-width: 100% !important; }
-/* Quote — fullscreen */
-:fullscreen .sl-qt,
-:-webkit-full-screen .sl-qt { padding: 60px 120px !important; }
-:fullscreen .sl-qt-text,
-:-webkit-full-screen .sl-qt-text { font-size: clamp(28px, 3.8vw, 64px) !important; max-width: 900px !important; }
-/* Conversation — fullscreen */
-:fullscreen .sl-cv,
-:-webkit-full-screen .sl-cv { padding: 60px 100px !important; }
-:fullscreen .sl-cv-q,
-:-webkit-full-screen .sl-cv-q { font-size: clamp(28px, 3.4vw, 56px) !important; max-width: 900px !important; }
-:fullscreen .sl-cv-n,
-:-webkit-full-screen .sl-cv-n { font-size: clamp(14px, 1.4vw, 22px) !important; max-width: 700px !important; }
-/* Workbook — fullscreen */
-:fullscreen .sl-wb,
-:-webkit-full-screen .sl-wb { padding: 50px 80px !important; }
-:fullscreen .sl-wb-q,
-:-webkit-full-screen .sl-wb-q { font-size: clamp(26px, 3vw, 48px) !important; max-width: 100% !important; }
-:fullscreen .sl-wb-items,
-:-webkit-full-screen .sl-wb-items { max-width: 100% !important; }
-/* Closing — fullscreen */
-:fullscreen .sl-cl,
-:-webkit-full-screen .sl-cl { padding: 60px 100px !important; }
-:fullscreen .sl-cl-title,
-:-webkit-full-screen .sl-cl-title { font-size: clamp(28px, 3.4vw, 56px) !important; }
-:fullscreen .sl-cl-list li,
-:-webkit-full-screen .sl-cl-list li { font-size: clamp(14px, 1.5vw, 24px) !important; }
-/* Prayer — fullscreen */
-:fullscreen .sl-pr,
-:-webkit-full-screen .sl-pr { padding: 60px 100px !important; }
-:fullscreen .sl-pr-title,
-:-webkit-full-screen .sl-pr-title { font-size: clamp(28px, 3.4vw, 54px) !important; }
-:fullscreen .sl-pr-pts li,
-:-webkit-full-screen .sl-pr-pts li { font-size: clamp(13px, 1.4vw, 22px) !important; }
-
-/* PROJECTOR MODE — same proportions, slightly bigger since it's a full wall */
-body.projector-mode .slide {
-  max-width: none !important;
-  min-height: 100% !important;
-  width: 100% !important;
-  height: 100vh !important;
-  flex: 1 !important;
-  border: none !important;
-  padding: 6vh 8vw !important;
-  justify-content: center !important;
-  align-self: stretch !important;
-}
-body.projector-mode .sl-te { padding: 6vh 8vw !important; }
-body.projector-mode .sl-te-hl { font-size: clamp(36px, 4.5vw, 72px) !important; max-width: 100% !important; margin-bottom: 3vh !important; }
-body.projector-mode .sl-te-num { font-size: clamp(80px, 12vw, 160px) !important; }
-body.projector-mode .sl-pts { max-width: 100% !important; }
-body.projector-mode .sl-pts li { font-size: clamp(18px, 2vw, 30px) !important; padding: 1.2vh 0 !important; line-height: 1.4 !important; }
-body.projector-mode .sl-sc { padding: 6vh 8vw !important; border-left: 4px solid var(--gold) !important; }
-body.projector-mode .sl-sc-ref { font-size: clamp(12px, 1vw, 18px) !important; margin-bottom: 2vh !important; }
-body.projector-mode .sl-sc-text { font-size: clamp(20px, 2.4vw, 38px) !important; max-width: 100% !important; margin-bottom: 2.5vh !important; line-height: 1.5 !important; }
-body.projector-mode .sl-sc-tk { font-size: clamp(24px, 3vw, 48px) !important; max-width: 100% !important; }
-body.projector-mode .sl-qt { padding: 6vh 10vw !important; }
-body.projector-mode .sl-qm { font-size: clamp(60px, 9vw, 120px) !important; }
-body.projector-mode .sl-qt-text { font-size: clamp(30px, 4.2vw, 64px) !important; max-width: 80% !important; line-height: .97 !important; }
-body.projector-mode .sl-qa { font-size: clamp(12px, 1vw, 18px) !important; }
-body.projector-mode .sl-cv { padding: 6vh 8vw !important; }
-body.projector-mode .sl-cv-q { font-size: clamp(30px, 4vw, 60px) !important; max-width: 90% !important; }
-body.projector-mode .sl-cv-n { font-size: clamp(16px, 1.6vw, 26px) !important; max-width: 80% !important; }
-body.projector-mode .sl-cv-hdr { font-size: clamp(10px, .9vw, 16px) !important; }
-body.projector-mode .sl-wb { padding: 5vh 7vw !important; }
-body.projector-mode .sl-wb-q { font-size: clamp(30px, 3.8vw, 56px) !important; max-width: 100% !important; }
-body.projector-mode .sl-wb-i { font-size: clamp(14px, 1.4vw, 22px) !important; }
-body.projector-mode .sl-wb-items { max-width: 100% !important; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; gap: 6px !important; }
-body.projector-mode .sl-wb-item { font-size: clamp(12px, 1.3vw, 20px) !important; padding: 8px 12px !important; }
-body.projector-mode .sl-cl { padding: 6vh 8vw !important; }
-body.projector-mode .sl-cl-title { font-size: clamp(30px, 4vw, 60px) !important; margin-bottom: 3vh !important; }
-body.projector-mode .sl-cl-list li { font-size: clamp(16px, 1.8vw, 28px) !important; padding: 1vh 0 1vh 14px !important; }
-body.projector-mode .sl-pr { padding: 6vh 8vw !important; }
-body.projector-mode .sl-pr-title { font-size: clamp(32px, 4.2vw, 64px) !important; margin-bottom: 2.5vh !important; }
-body.projector-mode .sl-pr-pts li { font-size: clamp(14px, 1.6vw, 26px) !important; padding: .8vh 0 .8vh 14px !important; }
-body.projector-mode .sl-cover-title .t-built,
-body.projector-mode .sl-cover-title .t-before,
-body.projector-mode .sl-cover-title .t-bonded { font-size: clamp(52px, 8vw, 110px) !important; }
-body.projector-mode .sl-cover-sess { font-size: clamp(28px, 4vw, 56px) !important; }
-body.projector-mode .sl-cover-body { padding: 5vh 7vw !important; }
-body.projector-mode .sl-complete-title { font-size: clamp(36px, 5vw, 70px) !important; }
-body.projector-mode .sl-complete-icon { font-size: clamp(52px, 7vw, 90px) !important; }
 /* blueprint corner */
 .slide { min-height: clamp(260px, 60vw, 600px); max-width: 1060px; }
 .slide::after { content: ''; position: absolute; top: 0; right: 0; width: 120px; height: 120px; background-image: linear-gradient(rgba(108,108,108,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(108,108,108,.06) 1px, transparent 1px); background-size: 14px 14px; pointer-events: none; z-index: 0; }
+
+/* ═══════════════════════════════════════════════════
+   1920×1080 SLIDE SYSTEM
+   The slide is always 1920×1080. The ss-stage scales
+   it down (or up) to fit the viewport using CSS scale.
+   Content is sized relative to 1080px height so fonts
+   always look correct regardless of screen size.
+   ═══════════════════════════════════════════════════ */
+
+/* Stage becomes a centering viewport */
+.ss-stage {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  background: #000 !important;
+}
+
+/* The slide scaler — wraps the 1920×1080 slide */
+.slide-scaler {
+  width: 1920px;
+  height: 1080px;
+  position: relative;
+  transform-origin: center center;
+  flex-shrink: 0;
+}
+
+/* Every .slide inside the scaler fills 1920×1080 */
+.slide-scaler .slide {
+  width: 1920px !important;
+  height: 1080px !important;
+  max-width: none !important;
+  min-height: unset !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border: none !important;
+  overflow: hidden !important;
+}
+
+/* Centered slides — quote, conversation, session-complete */
+.slide-scaler .sl-qt,
+.slide-scaler .sl-cv,
+.slide-scaler .sl-complete {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+/* Teaching slides — left-aligned, vertically centered */
+.slide-scaler .sl-te,
+.slide-scaler .sl-sc,
+.slide-scaler .sl-cl,
+.slide-scaler .sl-pr,
+.slide-scaler .sl-wb {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  padding: 80px 120px !important;
+}
+
+/* Centered slide inner padding */
+.slide-scaler .sl-qt  { padding: 80px 160px !important; }
+.slide-scaler .sl-cv  { padding: 80px 160px !important; flex-direction: column !important; }
+
+/* Teaching headline */
+.slide-scaler .sl-te-hl { font-size: 72px !important; max-width: 100% !important; line-height: .95 !important; margin-bottom: 48px !important; }
+.slide-scaler .sl-te-num { font-size: 180px !important; }
+.slide-scaler .sl-pts { max-width: 100% !important; width: 100% !important; }
+.slide-scaler .sl-pts li { font-size: 32px !important; padding: 16px 0 !important; line-height: 1.35 !important; }
+
+/* Scripture */
+.slide-scaler .sl-sc { border-left: 5px solid var(--gold) !important; }
+.slide-scaler .sl-sc-ref { font-size: 18px !important; letter-spacing: .22em !important; margin-bottom: 28px !important; }
+.slide-scaler .sl-sc-text { font-size: 40px !important; max-width: 100% !important; line-height: 1.45 !important; margin-bottom: 36px !important; }
+.slide-scaler .sl-sc-tk { font-size: 52px !important; max-width: 100% !important; line-height: 1.1 !important; }
+
+/* Quote */
+.slide-scaler .sl-qm { font-size: 120px !important; line-height: 1 !important; margin-bottom: 8px !important; }
+.slide-scaler .sl-qt-text { font-size: 72px !important; max-width: 1400px !important; line-height: .97 !important; }
+.slide-scaler .sl-qa { font-size: 22px !important; margin-top: 28px !important; }
+
+/* Conversation */
+.slide-scaler .sl-cv-hdr { font-size: 18px !important; letter-spacing: .2em !important; margin-bottom: 24px !important; }
+.slide-scaler .sl-cv-q { font-size: 68px !important; max-width: 1500px !important; line-height: 1.0 !important; }
+.slide-scaler .sl-cv-n { font-size: 28px !important; max-width: 1200px !important; margin-top: 28px !important; }
+
+/* Workbook */
+.slide-scaler .sl-wb-hd { font-size: 18px !important; margin-bottom: 12px !important; }
+.slide-scaler .sl-wb-q { font-size: 56px !important; max-width: 100% !important; line-height: 1.05 !important; margin-bottom: 32px !important; }
+.slide-scaler .sl-wb-i { font-size: 24px !important; margin-bottom: 28px !important; }
+.slide-scaler .sl-wb-items { max-width: 100% !important; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important; gap: 12px !important; }
+.slide-scaler .sl-wb-item { font-size: 24px !important; padding: 14px 18px !important; }
+
+/* Closing */
+.slide-scaler .sl-cl-title { font-size: 64px !important; line-height: .97 !important; margin-bottom: 40px !important; }
+.slide-scaler .sl-cl-list li { font-size: 32px !important; padding: 14px 0 14px 20px !important; line-height: 1.35 !important; }
+
+/* Prayer */
+.slide-scaler .sl-pr-title { font-size: 64px !important; line-height: .97 !important; margin-bottom: 40px !important; }
+.slide-scaler .sl-pr-pts li { font-size: 28px !important; padding: 12px 0 12px 20px !important; line-height: 1.4 !important; }
+
+/* Cover */
+.slide-scaler .sl-cover-title .t-built,
+.slide-scaler .sl-cover-title .t-before,
+.slide-scaler .sl-cover-title .t-bonded { font-size: 140px !important; }
+.slide-scaler .sl-cover-sess { font-size: 64px !important; margin-bottom: 16px !important; }
+.slide-scaler .sl-cover-body { padding: 60px 100px !important; }
+
+/* Session complete */
+.slide-scaler .sl-complete-icon { font-size: 100px !important; }
+.slide-scaler .sl-complete-title { font-size: 80px !important; }
+
+/* Projector stage — fills entire viewport, black bars if needed */
+body.projector-mode .ss-stage {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+/* Fullscreen stage */
+:fullscreen .ss-stage,
+:-webkit-full-screen .ss-stage {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+/* Hide browser chrome in fullscreen */
+:fullscreen .ss-hdr,
+:-webkit-full-screen .ss-hdr { display: none !important; }
+
+/* Projector-mode slide overrides still needed for non-scaler path */
+body.projector-mode .slide {
+  max-width: none !important;
+  width: 100% !important;
+  flex: 1 !important;
+  border: none !important;
+}
 
 /* COVER */
 .sl-cover { position: relative; background: var(--bgd); border: 1px solid var(--ln); justify-content: center; align-items: center; min-height: clamp(300px,60vw,620px); }
@@ -2236,8 +2253,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2604,6 +2621,25 @@ let slideLocked = false;
 let sessTimerStart = null;
 let sessTimerInterval = null;
 
+// ── 1920×1080 SLIDE SCALER ──
+function initSlideScaler() {
+  scaleSlides();
+}
+function scaleSlides() {
+  const stage = document.querySelector('.ss-stage');
+  if (!stage) return;
+  const stageW = stage.clientWidth || window.innerWidth;
+  const stageH = stage.clientHeight || window.innerHeight;
+  const scaleX = stageW / 1920;
+  const scaleY = stageH / 1080;
+  const scale = Math.min(scaleX, scaleY);
+  document.querySelectorAll('.slide-scaler').forEach(scaler => {
+    scaler.style.transform = `scale(${scale})`;
+  });
+}
+window.addEventListener('resize', scaleSlides);
+document.addEventListener('fullscreenchange', () => setTimeout(scaleSlides, 50));
+
 function openSS(i) {
   curSess = i; curSlide = 0;
   slideLocked = false;
@@ -2616,6 +2652,7 @@ function openSS(i) {
   document.getElementById('sh').classList.remove('on');
   document.getElementById('ssl').classList.add('on');
   goTo(0);
+  requestAnimationFrame(() => scaleSlides());
   document.body.style.overflow = 'hidden';
   // Show wall button for admin
   const wb = document.getElementById('wall-btn');
@@ -2660,7 +2697,10 @@ function closeSlideshow() {
   }
 }
 function buildSlides(slides) {
-  document.getElementById('ss-slides').innerHTML = slides.map((s, i) => renderSlide(s, i)).join('');
+  document.getElementById('ss-slides').innerHTML = slides.map((s, i) =>
+    `<div class="slide-scaler">${renderSlide(s, i)}</div>`
+  ).join('');
+  requestAnimationFrame(() => scaleSlides());
 }
 function renderSlide(s, i) {
   const d = `data-i="${i}"`;
