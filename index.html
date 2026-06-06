@@ -2372,8 +2372,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2404,6 +2404,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('projector-wait').classList.remove('hidden');
     initProjectorQR();
     initRealtimeSync(); // attempt realtime if Supabase configured
+    startLivePoll(); // keep response wall data current on projector too
   } else {
     if (localStorage.getItem('bbb_u') === '1') {
       showHub();
@@ -2603,6 +2604,11 @@ async function submit(btn, key, cat, sess, q) {
   } catch(e) {}
   btn.style.display = 'none';
   card.querySelector('.wb-ok').classList.add('on');
+  // Keep the live wall current immediately on this device, even before the next poll.
+  try {
+    liveData = [normalizeResponseRow({ ...payload, t: new Date().toLocaleTimeString(), created_at: new Date().toISOString() }), ...(liveData || [])];
+    if (document.getElementById('response-wall') && document.getElementById('response-wall').classList.contains('on')) renderWall();
+  } catch(e) {}
   loadLocalResponses();
   playTone('submit');
   updateCompletionTabs();
@@ -2640,7 +2646,7 @@ function startLivePoll() {
     try {
       const r = await fetch(window.SB_URL + '/rest/v1/responses?order=created_at.desc&limit=100', { headers: { 'apikey': window.SB_KEY, 'Authorization': 'Bearer ' + window.SB_KEY } });
       const d = await r.json(); if (!Array.isArray(d)) return;
-      liveData = d;
+      liveData = d.map(normalizeResponseRow).filter(r => r.response);
       const kw = [['Influence','Identity','Spiritual','S1'],['Baggage','Wound','Pattern','S2'],['Stewardship','Discipline','Audit','Money'],['Boundary','Red','Sacred','Build'],['Overall Rating','Biggest Takeaway','One Step','Personal']];
       kw.forEach((words, i) => {
         const el = document.getElementById('rl' + (i+1)); if (!el) return;
@@ -2657,7 +2663,7 @@ function startLivePoll() {
 function updateSlideFeed(data) {
   const f = document.getElementById('sl-live-feed'); if (!f) return;
   const sess = parseInt(f.dataset.sess), cat = f.dataset.cat;
-  const rows = data.filter(x => x.session === sess && x.category && x.category.includes(cat)).slice(0, 5);
+  const rows = (data || []).map(normalizeResponseRow).filter(x => Number(x.session) === Number(sess) && x.category && x.category.includes(cat) && x.response).slice(0, 5);
   const items = f.querySelector('.sl-live-items'); if (!items) return;
   items.innerHTML = rows.length ? rows.map(x => `<div class="sl-live-item"><span class="nm">${x.name||'Anon'}</span>${x.response||''}</div>`).join('') : '<div class="sl-live-empty">Waiting for responses...</div>';
 }
@@ -3066,6 +3072,9 @@ function handleLocalSyncEvent(message = {}) {
     return;
   }
   if (event === 'show-wall') {
+    if (payload.responses && Array.isArray(payload.responses)) {
+      liveData = payload.responses.map(normalizeResponseRow).filter(r => r.response);
+    }
     if (isProjector) openWall({ fromBroadcast: true });
     return;
   }
@@ -3157,8 +3166,9 @@ function initProjectorMode() {
         const ov = document.getElementById('feat-q-overlay');
         if (ov) ov.remove();
       })
-      .on('broadcast', { event: 'show-wall' }, () => {
-        openWall();
+      .on('broadcast', { event: 'show-wall' }, ({ payload }) => {
+        if (payload && Array.isArray(payload.responses)) liveData = payload.responses.map(normalizeResponseRow).filter(r => r.response);
+        openWall({ fromBroadcast: true });
       })
       .on('broadcast', { event: 'close-wall' }, () => {
         closeWall();
@@ -3478,8 +3488,9 @@ function initAttendeeFollow() {
         // Show follow indicator briefly
         showFollowToggle();
       })
-      .on('broadcast', { event: 'show-wall' }, () => {
-        openWall();
+      .on('broadcast', { event: 'show-wall' }, ({ payload }) => {
+        if (payload && Array.isArray(payload.responses)) liveData = payload.responses.map(normalizeResponseRow).filter(r => r.response);
+        openWall({ fromBroadcast: true });
       })
       .on('broadcast', { event: 'close-wall' }, () => {
         closeWall();
@@ -5017,8 +5028,9 @@ function openWall(opts = {}) {
   renderWall();
   // Broadcast to projector and attendees
   if (isAdmin && !opts.fromBroadcast) {
-    emitLocalSync('show-wall', {});
-    if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'show-wall', payload: {} });
+    const wallPayload = { responses: getWallPayloadResponses(), filter: wallFilter };
+    emitLocalSync('show-wall', wallPayload);
+    if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'show-wall', payload: wallPayload });
   }
 }
 function closeWall(opts = {}) {
@@ -5036,13 +5048,35 @@ function filterWall(btn) {
   wallFilter = parseInt(btn.dataset.sess);
   renderWall();
 }
+
+function normalizeResponseText(r) {
+  if (!r) return '';
+  return String(r.response ?? r.text ?? r.answer ?? r.content ?? r.message ?? r.value ?? '').trim();
+}
+function normalizeResponseRow(r) {
+  const response = normalizeResponseText(r);
+  return {
+    ...r,
+    response,
+    session: Number(r.session || r.sess || r.session_id || 0),
+    category: r.category || r.cat || r.question || '',
+    name: r.name || r.user_name || r.attendee || 'Attendee',
+    anonymous: !!r.anonymous,
+    created_at: r.created_at || r.submitted_at || r.t || new Date().toISOString(),
+    id: r.id || r.response_id || r.created_at || r.t || Math.random().toString(36).slice(2)
+  };
+}
+function getWallPayloadResponses() {
+  const source = liveData && liveData.length ? liveData : getLocalResponses();
+  return (Array.isArray(source) ? source : []).map(normalizeResponseRow).filter(r => r.response);
+}
 function renderWall() {
   const grid = document.getElementById('rw-grid');
   if (!grid) return;
-  let data = liveData.length ? liveData : getLocalResponses();
-  if (wallFilter > 0) data = data.filter(r => r.session === wallFilter);
-  // Filter out non-substantive entries
-  data = data.filter(r => r.response && r.response.length > 5);
+  let data = getWallPayloadResponses();
+  if (wallFilter > 0) data = data.filter(r => Number(r.session) === Number(wallFilter));
+  // Keep short answers too. In live use, even a short response may be intentional.
+  data = data.filter(r => normalizeResponseText(r));
   if (!data.length) {
     const emptyHtml = '<div class="rw-empty">No responses yet. Responses appear as attendees submit their workbooks.</div>';
     if (grid.innerHTML !== emptyHtml) grid.innerHTML = emptyHtml;
@@ -5051,7 +5085,7 @@ function renderWall() {
   }
   const hiddenIds = JSON.parse(localStorage.getItem('bbb_hidden') || '[]');
   const visible = data.filter(r => !hiddenIds.includes(r.id || r.created_at)).slice(0, 50);
-  const sig = visible.map(r => `${r.id || r.created_at}:${r.response || ''}`).join('|') + `|filter:${wallFilter}|admin:${isAdmin}`;
+  const sig = visible.map(r => `${r.id || r.created_at}:${normalizeResponseText(r)}`).join('|') + `|filter:${wallFilter}|admin:${isAdmin}`;
   if (grid.dataset.sig === sig) return;
   grid.dataset.sig = sig;
   grid.innerHTML = visible.length ? visible.map(r => `
@@ -5060,7 +5094,7 @@ function renderWall() {
         <div class="rw-card-cat">${r.category || ''}</div>
         ${isAdmin ? `<button onclick="hideResponse('${r.id || r.created_at}')" style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:.7rem;padding:0;flex-shrink:0;transition:color .2s" title="Hide">&#10005;</button>` : ''}
       </div>
-      <div class="rw-card-text">${r.response || ''}</div>
+      <div class="rw-card-text">${normalizeResponseText(r)}</div>
       <div class="rw-card-name">${r.anonymous || r.name === 'Anonymous' ? 'Anonymous' : (r.name || 'Attendee')}</div>
     </div>`).join('') : '<div class="rw-empty">No responses visible. All responses may be hidden.</div>';
 }
