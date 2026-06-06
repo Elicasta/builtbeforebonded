@@ -549,8 +549,11 @@ body.am #qa-admin-panel { display: block !important; }
 .slide-scaler .sl-cover-body { padding: 60px 100px !important; }
 
 /* Session complete */
-.slide-scaler .sl-complete-icon { font-size: 100px !important; }
-.slide-scaler .sl-complete-title { font-size: 80px !important; }
+.slide-scaler .sl-complete-icon { font-size: 120px !important; margin-bottom: 24px !important; }
+.slide-scaler .sl-complete-title { font-size: 80px !important; margin-bottom: 20px !important; }
+.slide-scaler .sl-complete-sub { font-size: 28px !important; max-width: 1200px !important; margin-bottom: 48px !important; }
+.slide-scaler .sl-complete-btns { gap: 24px !important; }
+.slide-scaler .sl-complete-btns .btn { font-size: 22px !important; padding: 20px 40px !important; }
 
 /* Projector stage — fills entire viewport */
 body.projector-mode #ssl {
@@ -724,8 +727,8 @@ body.am #ssl .presenter-bar { display: block; }
 
 /* ── SESSION COMPLETE CARD ── */
 .sl-complete { flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 36px; background: var(--bg); border: 1px solid var(--ln); border-top: 2px solid var(--gold); }
-.sl-complete-icon { font-family: var(--fd); font-size: clamp(48px,9vw,88px); color: var(--gold); line-height: 1; margin-bottom: 10px;  opacity: 0; }
-.sl-complete-title { font-family: var(--fd); font-size: clamp(20px,3.8vw,44px); color: var(--w); text-transform: uppercase; line-height: .97; margin-bottom: 12px; opacity: 0; }
+.sl-complete-icon { font-family: var(--fd); font-size: clamp(48px,9vw,88px); color: var(--gold); line-height: 1; margin-bottom: 10px; }
+.sl-complete-title { font-family: var(--fd); font-size: clamp(20px,3.8vw,44px); color: var(--w); text-transform: uppercase; line-height: .97; margin-bottom: 12px; }
 .sl-complete-sub { font-family: var(--fc); font-size: clamp(.7rem,1.2vw,.88rem); color: var(--mu); margin-bottom: 24px; max-width: 440px; line-height: 1.5; }
 .sl-complete-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 
@@ -1908,7 +1911,7 @@ body.am .qa-bank-btn { display: flex; }
       <button class="ss-btn" onclick="closeSlideshow()">&#10005;</button>
     </div>
   </div>
-  <div class="ss-stage" id="ss-stage" onclick="nextSlide()">
+  <div class="ss-stage" id="ss-stage" onclick="handleStageClick(event)">
     <div class="ss-arrow ss-arrow-l" onclick="event.stopPropagation();prevSlide()">&#8249;</div>
     <div id="ss-slides"></div>
     <div class="ss-arrow ss-arrow-r" onclick="event.stopPropagation();nextSlide()">&#8250;</div>
@@ -2240,8 +2243,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2813,6 +2816,15 @@ function goTo(i) {
   // Update slide notes visibility
   updateSlideNoteVisibility();
 }
+function handleStageClick(e) {
+  // Don't advance if clicking a button, link, input, or textarea
+  if (e.target.closest('button, a, input, textarea, .sl-wb-answer-btn, .sl-complete-btns')) return;
+  // Don't advance on session complete or thank you slides
+  const slide = SESSIONS[curSess]?.slides[curSlide];
+  if (slide && (slide.t === 'sc_complete' || slide.t === 'ty')) return;
+  nextSlide();
+}
+
 function nextSlide() {
   if (slideLocked) return;
   if (document.getElementById('answer-drawer').classList.contains('open')) return;
