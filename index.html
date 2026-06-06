@@ -141,7 +141,7 @@ body.am .rsp-panel { display: block !important; }
 body.am #qa-admin-panel { display: block !important; }
 
 /* ── HUB HERO ── */
-.hub-hero { position: relative; padding: clamp(32px,5vw,72px) clamp(16px,4vw,48px); overflow: hidden; background: var(--bgd); border-bottom: 1px solid var(--ln); }
+.hub-hero { position: relative; padding: clamp(40px,6vw,88px) clamp(16px,4vw,48px); overflow: hidden; background: var(--bgd); border-bottom: 1px solid var(--ln); }
 .hub-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 60% at 75% 50%, rgba(184,137,59,.07) 0%, transparent 60%); pointer-events: none; }
 .hub-hero::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(108,108,108,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(108,108,108,.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
 .hub-hero-inner { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; }
@@ -169,13 +169,13 @@ body.am #qa-admin-panel { display: block !important; }
 .sess-chip-sub { font-size: .64rem; color: var(--mu); line-height: 1.3; }
 
 /* ── HUB CONTENT ── */
-.hub-content { max-width: 1400px; margin: 0 auto; padding: clamp(20px,4vw,60px) clamp(16px,4vw,48px); width: 100%; }
-.h-sec { margin-bottom: 56px; }
-.h-sec-hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.hub-content { max-width: 1400px; margin: 0 auto; padding: clamp(28px,5vw,72px) clamp(16px,4vw,48px); width: 100%; }
+.h-sec { margin-bottom: 64px; }
+.h-sec-hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; margin-bottom: 24px; }
 .h-sec-title { font-family: var(--fc); font-size: .68rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
 .h-sec-line { flex: 1; height: 1px; background: var(--ln); }
-.s-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2px; margin-bottom: 2px; }
-.s-item { background: var(--bgc); border: 1px solid var(--ln); padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
+.s-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3px; margin-bottom: 3px; }
+.s-item { background: var(--bgc); border: 1px solid var(--ln); padding: 20px 20px; display: flex; gap: 16px; align-items: flex-start; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
 .s-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--gold); transform: scaleY(0); transform-origin: bottom; transition: transform .25s ease; }
 .s-item:hover::before { transform: scaleY(1); }
 .s-item:hover { border-color: rgba(184,137,59,.35); background: rgba(184,137,59,.03); }
@@ -189,17 +189,17 @@ body.am #qa-admin-panel { display: block !important; }
 .s-break .s-label { color: var(--rl); }
 
 /* ── WORKBOOK ── */
-.wb-tabs { display: flex; gap: 2px; margin-bottom: 18px; overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap; }
+.wb-tabs { display: flex; gap: 3px; margin-bottom: 24px; overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap; }
 .wb-tabs::-webkit-scrollbar { display: none; }
 .wb-tab { background: var(--bgc); border: 1px solid var(--ln); border-bottom: none; font-family: var(--fc); font-size: .64rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mu); padding: 8px 14px; cursor: pointer; white-space: nowrap; transition: all .2s; }
 .wb-tab.on { color: var(--gold); border-color: var(--gold); background: rgba(184,137,59,.05); }
 .wb-panel { display: none; }
 .wb-panel.on { display: block; }
-.wb-panel-hdr { background: var(--bgc); border: 1px solid var(--ln); padding: 18px 20px; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.wb-panel-hdr { background: var(--bgc); border: 1px solid var(--ln); padding: 24px 20px; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .wb-sess-label { font-family: var(--fc); font-size: .58rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
 .wb-sess-title { font-family: var(--fd); font-size: clamp(20px, 3.5vw, 32px); color: var(--w); text-transform: uppercase; line-height: 1; margin-bottom: 3px; }
 .wb-sess-desc { font-size: .78rem; color: var(--mu); }
-.wb-qs { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+.wb-qs { display: flex; flex-direction: column; gap: 3px; }
 .wb-qc { background: var(--bgc); border: 1px solid var(--ln); padding: 18px; }
 .wb-qn { font-family: var(--fd); font-size: 1.8rem; color: var(--ln); line-height: 1; margin-bottom: 5px; }
 .wb-qcat { font-family: var(--fc); font-size: .58rem; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
@@ -425,7 +425,7 @@ body.am #qa-admin-panel { display: block !important; }
 .slide::after { content: ''; position: absolute; top: 0; right: 0; width: 120px; height: 120px; background-image: linear-gradient(rgba(108,108,108,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(108,108,108,.06) 1px, transparent 1px); background-size: 14px 14px; pointer-events: none; z-index: 0; }
 
 /* COVER */
-.sl-cover { position: relative; background: var(--bgd); border: 1px solid var(--ln); }
+.sl-cover { position: relative; background: var(--bgd); border: 1px solid var(--ln); justify-content: center; align-items: center; }
 .sl-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: .28; filter: contrast(1.1) brightness(.75); }
 .sl-cover-ov { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(13,13,13,.96) 48%, rgba(13,13,13,.5) 100%); }
 .sl-cover-body { position: relative; z-index: 2; padding: 22px 28px; display: flex; flex-direction: column; justify-content: space-between; height: 100%; width: 100%; }
@@ -537,8 +537,7 @@ body.am #ssl .presenter-bar { display: block; }
 .presenter-notes { background: rgba(13,13,13,.92); border: 1px solid rgba(184,137,59,.3); border-left: 3px solid var(--gold); padding: 8px 14px; font-family: var(--fc); font-size: .62rem; color: rgba(184,137,59,.9); letter-spacing: .08em; line-height: 1.5; backdrop-filter: blur(4px); max-height: 60px; overflow: hidden; }
 
 /* ── SLIDE TIMER (admin) ── */
-.slide-timer-bar { position: absolute; top: 52px; right: 12px; z-index: 20; display: none; }
-body.am #ssl .slide-timer-bar { display: flex; align-items: center; gap: 8px; }
+.slide-timer-bar { display: none !important; }
 .slide-timer { font-family: var(--fd); font-size: 1.1rem; color: var(--gold); line-height: 1; min-width: 48px; text-align: right; }
 .slide-timer.warn { color: var(--rl); }
 .timer-label { font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mu); }
@@ -589,7 +588,7 @@ body.am #ssl .slide-timer-bar { display: flex; align-items: center; gap: 8px; }
 
 /* ── QR CODE ── */
 .qr-section { margin-top: 20px; }
-.qr-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 12px 0; }
+.qr-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 12px 0; line-height: 0; }
 .qr-label { font-family: var(--fc); font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mu); }
 .qr-url { font-family: var(--fc); font-size: .72rem; color: var(--gold); letter-spacing: .08em; }
 
@@ -602,7 +601,7 @@ body.am #ssl .slide-timer-bar { display: flex; align-items: center; gap: 8px; }
 .cw-controls { display: flex; gap: 8px; align-items: center; }
 .cw-filter { background: #1E1E1E; border: 1px solid #2A2A2A; color: #888; font-family: 'Barlow Condensed', sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 6px 11px; cursor: pointer; transition: all .2s; }
 .cw-filter.on { border-color: #B8893B; color: #B8893B; background: rgba(184,137,59,.07); }
-#constellation-cv { position: absolute; left: 0; display: block; }
+#constellation-cv { display: block; width: 100%; flex: 1; }
 
 /* ── FOUNDATION PROGRESS ── */
 .foundation-bar { display: flex; align-items: center; padding: 6px 20px; background: var(--bg); border-bottom: 1px solid var(--ln); gap: 12px; overflow: hidden; }
@@ -849,119 +848,291 @@ body.am .qa-bank-btn { display: flex; }
 .qa-count-badge { background: var(--gold); color: var(--bg); font-size: .56rem; font-weight: 700; padding: 1px 5px; border-radius: 10px; min-width: 16px; text-align: center; }
 
 /* ═══════════════════════════════════════════
-   ADMIN DASHBOARD
+   ADMIN DASHBOARD — REBUILT FOR LIVE USE
    ═══════════════════════════════════════════ */
 #admin-hub { flex-direction: column; background: var(--bg); }
 
-/* Top control bar */
-.adm-bar { background: var(--bgd); border-bottom: 2px solid var(--gold); padding: 10px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
-.adm-bar-logo { font-family: var(--fd); font-size: 1.1rem; color: var(--w); letter-spacing: .04em; white-space: nowrap; }
-.adm-bar-logo span { color: var(--gold); }
-.adm-bar-badge { background: var(--gold); color: var(--bg); font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+/* ── TOP BAR: minimal, focused on presentation control ── */
+.adm-bar {
+  background: var(--bgd);
+  border-bottom: 2px solid var(--gold);
+  padding: 0 16px;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+/* Timer — big, leftmost, always visible */
+.adm-timer-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 0 0;
+  border-right: 1px solid var(--ln);
+  flex-shrink: 0;
+}
+.adm-timer-lbl { font-family: var(--fc); font-size: .48rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--mu); white-space: nowrap; }
+.adm-sess-timer { font-family: var(--fd); font-size: 2rem; color: var(--gold); line-height: 1; min-width: 62px; }
+.adm-sess-timer.warn { color: var(--rl); animation: pulse .8s infinite; }
+
+/* Slide nav — center of bar, the main action zone */
+.adm-nav-block {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  border-right: 1px solid var(--ln);
+  flex-shrink: 0;
+}
+.adm-nav-prev, .adm-nav-next {
+  background: var(--bgc);
+  border: 1px solid var(--ln);
+  color: var(--w);
+  font-family: var(--fc);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.adm-nav-prev:hover { border-color: var(--gold); color: var(--gold); }
+.adm-nav-next { background: var(--gold); border-color: var(--gold); color: var(--bg); font-size: .8rem; padding: 8px 24px; }
+.adm-nav-next:hover { background: var(--gl); border-color: var(--gl); }
+.adm-nav-counter {
+  font-family: var(--fd);
+  font-size: 1.1rem;
+  color: var(--gold);
+  min-width: 52px;
+  text-align: center;
+  line-height: 1;
+}
+
+/* Lock button */
+.adm-lock-pill {
+  background: transparent;
+  border: 1px solid var(--ln);
+  color: var(--mu);
+  font-family: var(--fc);
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+.adm-lock-pill:hover { border-color: var(--gold); color: var(--gold); }
+.adm-lock-pill.danger { border-color: var(--rl); color: var(--rl); }
+
+/* Stats — compact, right of nav */
+.adm-stats-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  border-right: 1px solid var(--ln);
+  flex-shrink: 0;
+}
+.adm-stat { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.adm-stat .lbl { font-family: var(--fc); font-size: .45rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mu); white-space: nowrap; }
+.adm-stat .val { font-family: var(--fd); font-size: 1rem; color: var(--w); line-height: 1; }
+.adm-stat .val.gold { color: var(--gold); }
+.adm-stat .val.green { color: #4CAF50; }
+
+/* Sync pill */
+.adm-sync-pill { display: flex; align-items: center; gap: 6px; padding: 0 16px; border-right: 1px solid var(--ln); font-family: var(--fc); font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mu); flex-shrink: 0; }
+.adm-sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ln); transition: background .3s; flex-shrink: 0; }
+.adm-sync-dot.live { background: #4CAF50; animation: pulse 1.5s infinite; }
+
+/* Right: overflow tools — secondary, smaller */
+.adm-tools-block {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 0 0 12px;
+}
+.adm-tool-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--mu);
+  font-family: var(--fc);
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 6px 9px;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.adm-tool-btn:hover { color: var(--gold); border-color: rgba(184,137,59,.3); }
+.adm-tool-btn.adm-view-btn { border-color: var(--ln); color: var(--mu); }
+.adm-tool-btn.adm-view-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* Shared ctrl btn — keep for JS compatibility */
+.adm-ctrl-btn { background: var(--bgc); border: 1px solid var(--ln); color: var(--mu); font-family: var(--fc); font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 7px 12px; cursor: pointer; transition: all .2s; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+.adm-ctrl-btn:hover { color: var(--gold); border-color: var(--gold); }
+.adm-ctrl-btn.active { background: rgba(184,137,59,.12); border-color: var(--gold); color: var(--gold); }
+.adm-ctrl-btn.danger { border-color: rgba(155,69,39,.4); color: var(--rl); }
+.adm-ctrl-btn.danger:hover { background: rgba(155,69,39,.1); border-color: var(--rl); }
+/* Keep these for backwards compat */
 .adm-bar-divider { width: 1px; height: 24px; background: var(--ln); flex-shrink: 0; }
 .adm-bar-stat { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 52px; }
 .adm-bar-stat .lbl { font-family: var(--fc); font-size: .48rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mu); }
 .adm-bar-stat .val { font-family: var(--fd); font-size: 1.1rem; color: var(--w); line-height: 1; }
 .adm-bar-stat .val.gold { color: var(--gold); }
 .adm-bar-stat .val.green { color: #4CAF50; }
-.adm-sess-timer { font-family: var(--fd); font-size: 1.8rem; color: var(--gold); line-height: 1; min-width: 56px; }
-.adm-sess-timer.warn { color: var(--rl); animation: pulse .8s infinite; }
-.adm-ctrl-btn { background: var(--bgc); border: 1px solid var(--ln); color: var(--mu); font-family: var(--fc); font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 7px 12px; cursor: pointer; transition: all .2s; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
-.adm-ctrl-btn:hover { color: var(--gold); border-color: var(--gold); }
-.adm-ctrl-btn.active { background: rgba(184,137,59,.12); border-color: var(--gold); color: var(--gold); }
-.adm-ctrl-btn.danger { border-color: rgba(155,69,39,.4); color: var(--rl); }
-.adm-ctrl-btn.danger:hover { background: rgba(155,69,39,.1); border-color: var(--rl); }
-.adm-sync-pill { display: flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid var(--ln); background: var(--bgc); font-family: var(--fc); font-size: .6rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mu); }
-.adm-sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ln); transition: background .3s; flex-shrink: 0; }
-.adm-sync-dot.live { background: #4CAF50; animation: pulse 1.5s infinite; }
 .adm-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 
-/* Main dashboard grid */
-.adm-grid { display: grid; grid-template-columns: 280px 1fr 280px; gap: 2px; flex: 1; min-height: 0; overflow: hidden; }
+/* ── MAIN GRID: 3 columns ── */
+/* Left: Q&A + notes (widest — what you watch during a talk) */
+/* Center: Slide preview + session tabs */
+/* Right: Slide list + responses */
+.adm-grid {
+  display: grid;
+  grid-template-columns: 1fr 420px 280px;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--ln);
+}
 
-/* Left: Slide control panel */
-.adm-slide-panel { background: var(--bgd); border-right: 1px solid var(--ln); display: flex; flex-direction: column; overflow: hidden; }
-.adm-panel-hdr { padding: 12px 16px; border-bottom: 1px solid var(--ln); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+/* LEFT COLUMN: Q&A queue (primary action during talk) */
+.adm-qa-col {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  border-right: 1px solid var(--ln);
+  min-height: 0;
+  height: 100%;
+}
+.adm-qa-col-hdr {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--ln);
+  background: var(--bgd);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.adm-qa-col-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* Featured question at top of Q&A col — large gold strip */
+.adm-featured-q { background: rgba(184,137,59,.06); border: 1px solid rgba(184,137,59,.25); border-left: 3px solid var(--gold); padding: 10px 14px; margin-bottom: 8px; display: none; }
+.adm-featured-q.show { display: block; }
+.adm-featured-lbl { font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
+.adm-featured-text { font-family: var(--fc); font-size: .86rem; color: var(--w); line-height: 1.4; }
+
+/* Q&A items — bigger feature button for live use */
+.adm-qa-item { background: var(--bgc); border: 1px solid var(--ln); padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; transition: border-color .2s; animation: fuUp .35s ease; }
+.adm-qa-item:hover { border-color: rgba(184,137,59,.3); }
+.adm-qa-num { font-family: var(--fd); font-size: 1.4rem; color: var(--ln); line-height: 1; flex-shrink: 0; min-width: 22px; }
+.adm-qa-text { font-family: var(--fc); font-size: .84rem; color: var(--w); line-height: 1.45; flex: 1; }
+.adm-qa-meta { font-family: var(--fc); font-size: .56rem; color: var(--mu); margin-top: 4px; letter-spacing: .08em; text-transform: uppercase; }
+.adm-qa-actions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.adm-qa-feat { background: var(--gold); border: none; color: var(--bg); font-family: var(--fc); font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 7px 12px; cursor: pointer; transition: background .2s; white-space: nowrap; }
+.adm-qa-feat:hover { background: var(--gl); }
+.adm-qa-hide { background: rgba(155,69,39,.15); border: 1px solid rgba(155,69,39,.3); color: var(--rl); font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 4px 8px; cursor: pointer; transition: all .2s; }
+.adm-qa-hide:hover { background: rgba(155,69,39,.3); }
+.adm-empty { font-family: var(--fc); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ln); text-align: center; padding: 32px 0; }
+
+/* Session launch bar at bottom of Q&A col */
+.adm-launch-bar { background: var(--bgd); border-top: 1px solid var(--ln); padding: 8px 12px; display: flex; gap: 5px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+
+/* CENTER COLUMN: slide preview */
+.adm-slide-panel {
+  background: var(--bgd);
+  border-right: 1px solid var(--ln);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  height: 100%;
+}
+.adm-panel-hdr { padding: 10px 14px; border-bottom: 1px solid var(--ln); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
 .adm-panel-title { font-family: var(--fc); font-size: .62rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); }
-.adm-slide-preview { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
-.adm-slide-thumb { background: var(--bgc); border: 1px solid var(--ln); padding: 10px 12px; cursor: pointer; transition: all .2s; display: flex; gap: 10px; align-items: flex-start; }
+.adm-slide-preview { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+.adm-slide-thumb { background: var(--bgc); border: 1px solid var(--ln); padding: 9px 11px; cursor: pointer; transition: all .2s; display: flex; gap: 9px; align-items: flex-start; }
 .adm-slide-thumb:hover { border-color: rgba(184,137,59,.4); }
 .adm-slide-thumb.current { border-color: var(--gold); background: rgba(184,137,59,.08); }
 .adm-slide-thumb.current .adm-slide-num { color: var(--gold); }
 .adm-slide-num { font-family: var(--fd); font-size: 1.1rem; color: var(--ln); line-height: 1; flex-shrink: 0; min-width: 22px; }
 .adm-slide-type { font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mu); margin-bottom: 2px; }
-.adm-slide-label { font-family: var(--fc); font-size: .78rem; font-weight: 600; color: var(--w); line-height: 1.3; }
+.adm-slide-label { font-family: var(--fc); font-size: .76rem; font-weight: 600; color: var(--w); line-height: 1.3; }
 
-/* Session selector tabs */
-.adm-sess-tabs { display: flex; gap: 1px; border-bottom: 1px solid var(--ln); flex-shrink: 0; }
-.adm-sess-tab { flex: 1; text-align: center; padding: 8px 4px; font-family: var(--fc); font-size: .56rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mu); cursor: pointer; background: var(--bgc); border: none; transition: all .2s; border-bottom: 2px solid transparent; }
-.adm-sess-tab.on { color: var(--gold); background: rgba(184,137,59,.06); border-bottom-color: var(--gold); }
-.adm-sess-tab:hover { color: var(--w); }
+/* Notes panel */
+.adm-notes-panel { border-top: 2px solid rgba(184,137,59,.3); padding: 14px; flex-shrink: 0; background: rgba(184,137,59,.04); max-height: 260px; overflow-y: auto; }
+.adm-notes-lbl { font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+.adm-notes-type { font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(184,137,59,.5); margin-bottom: 10px; }
+.adm-notes-section-lbl { font-family: var(--fc); font-size: .48rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; border-bottom: 1px solid rgba(184,137,59,.15); padding-bottom: 3px; }
+.adm-notes-content { font-family: var(--fc); font-size: .8rem; color: var(--w); line-height: 1.6; margin-bottom: 4px; }
+.adm-notes-note { font-family: var(--fc); font-size: .76rem; color: rgba(184,137,59,.9); line-height: 1.55; }
 
-/* Notes panel at bottom of slide panel */
-.adm-notes-panel { border-top: 1px solid var(--ln); padding: 12px; flex-shrink: 0; background: rgba(184,137,59,.04); }
-.adm-notes-lbl { font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
-.adm-notes-text { font-family: var(--fc); font-size: .74rem; color: var(--mu); line-height: 1.5; min-height: 42px; }
-
-/* Center: Q&A + responses */
-.adm-center { display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
-.adm-center-top { flex: 1; overflow-y: auto; padding: 16px; }
-.adm-center-bottom { border-top: 1px solid var(--ln); padding: 12px 16px; background: var(--bgd); flex-shrink: 0; }
-
-/* Q&A queue */
-.adm-qa-item { background: var(--bgc); border: 1px solid var(--ln); padding: 12px 14px; margin-bottom: 4px; display: flex; gap: 10px; align-items: flex-start; transition: border-color .2s; animation: fuUp .35s ease; }
-.adm-qa-item:hover { border-color: rgba(184,137,59,.3); }
-.adm-qa-num { font-family: var(--fd); font-size: 1.4rem; color: var(--ln); line-height: 1; flex-shrink: 0; min-width: 22px; }
-.adm-qa-text { font-family: var(--fc); font-size: .82rem; color: var(--w); line-height: 1.4; flex: 1; }
-.adm-qa-meta { font-family: var(--fc); font-size: .56rem; color: var(--mu); margin-top: 4px; letter-spacing: .08em; text-transform: uppercase; }
-.adm-qa-actions { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
-.adm-qa-feat { background: var(--gold); border: none; color: var(--bg); font-family: var(--fc); font-size: .56rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 4px 8px; cursor: pointer; transition: background .2s; white-space: nowrap; }
-.adm-qa-feat:hover { background: var(--gl); }
-.adm-qa-hide { background: rgba(155,69,39,.15); border: 1px solid rgba(155,69,39,.3); color: var(--rl); font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 3px 7px; cursor: pointer; transition: all .2s; }
-.adm-qa-hide:hover { background: rgba(155,69,39,.3); }
-.adm-empty { font-family: var(--fc); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ln); text-align: center; padding: 32px 0; }
-
-/* Featured question display in dashboard */
-.adm-featured-q { background: rgba(184,137,59,.06); border: 1px solid rgba(184,137,59,.25); border-left: 3px solid var(--gold); padding: 10px 14px; margin-bottom: 12px; display: none; }
-.adm-featured-q.show { display: block; }
-.adm-featured-lbl { font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
-.adm-featured-text { font-family: var(--fc); font-size: .86rem; color: var(--w); line-height: 1.4; }
-
-/* Right: Live responses */
-.adm-resp-panel { background: var(--bgd); border-left: 1px solid var(--ln); display: flex; flex-direction: column; overflow: hidden; }
-.adm-resp-feed { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
-.adm-resp-item { background: var(--bgc); border: 1px solid var(--ln); padding: 10px 12px; animation: fuUp .4s ease; position: relative; }
+/* RIGHT COLUMN: live responses */
+.adm-resp-panel { background: var(--bgd); display: flex; flex-direction: column; overflow: hidden; min-height: 0; height: 100%; }
+.adm-resp-feed { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 3px; }
+.adm-resp-item { background: var(--bgc); border: 1px solid var(--ln); padding: 9px 11px; animation: fuUp .4s ease; position: relative; }
 .adm-resp-item .cat { font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 3px; display: flex; align-items: center; justify-content: space-between; }
 .adm-resp-item .txt { font-family: var(--fc); font-size: .76rem; color: var(--w); line-height: 1.4; }
 .adm-resp-item .who { font-family: var(--fc); font-size: .54rem; color: var(--mu); margin-top: 4px; }
 .adm-resp-hide { background: none; border: none; color: var(--ln); cursor: pointer; font-size: .7rem; padding: 0; transition: color .2s; line-height: 1; }
 .adm-resp-hide:hover { color: var(--rl); }
-
-/* Resp filter tabs */
 .adm-resp-filters { display: flex; gap: 1px; border-bottom: 1px solid var(--ln); flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
 .adm-resp-filters::-webkit-scrollbar { display: none; }
-.adm-resp-filter { flex-shrink: 0; padding: 7px 10px; font-family: var(--fc); font-size: .54rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mu); cursor: pointer; background: none; border: none; border-bottom: 2px solid transparent; transition: all .2s; }
+.adm-resp-filter { flex-shrink: 0; padding: 7px 9px; font-family: var(--fc); font-size: .54rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mu); cursor: pointer; background: none; border: none; border-bottom: 2px solid transparent; transition: all .2s; }
 .adm-resp-filter.on { color: var(--gold); border-bottom-color: var(--gold); }
 
-/* Bottom launch bar */
-.adm-launch-bar { background: var(--bgd); border-top: 1px solid var(--ln); padding: 10px 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-
-/* Mobile admin: stack layout */
+/* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-  .adm-grid { grid-template-columns: 1fr; overflow-y: auto; }
-  .adm-slide-panel { border-right: none; border-bottom: 1px solid var(--ln); max-height: 260px; }
+  .adm-grid { grid-template-columns: 1fr; grid-template-rows: auto; overflow-y: auto; }
   .adm-resp-panel { border-left: none; border-top: 1px solid var(--ln); max-height: 260px; }
-  .adm-bar { gap: 8px; }
+  .adm-slide-panel { max-height: 320px; }
+  .adm-bar { gap: 6px; flex-wrap: wrap; height: auto; padding: 8px 12px; }
   .adm-bar-divider { display: none; }
+  .adm-right { flex-wrap: wrap; }
+  .adm-tools-block { flex-wrap: wrap; }
+  .adm-nav-next { font-size: .72rem; padding: 8px 16px; }
 }
 @media (min-width: 1400px) {
-  .adm-grid { grid-template-columns: 320px 1fr 320px; }
-  .adm-slide-thumb { padding: 12px 14px; }
-  .adm-qa-text { font-size: .9rem; }
+  .adm-grid { grid-template-columns: 1fr 480px 300px; }
 }
 @media (min-width: 1800px) {
-  .adm-grid { grid-template-columns: 380px 1fr 380px; }
+  .adm-grid { grid-template-columns: 1fr 560px 340px; }
 }
+
+/* Session selector tabs */
+.adm-sess-tabs { display: flex; gap: 1px; border-bottom: 1px solid var(--ln); flex-shrink: 0; }
+.adm-sess-tab { flex: 1; text-align: center; padding: 9px 6px; font-family: var(--fc); font-size: .58rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mu); cursor: pointer; background: var(--bgc); border: none; border-right: 1px solid var(--ln); transition: all .2s; border-bottom: 2px solid transparent; }
+.adm-sess-tab.on { color: var(--gold); background: rgba(184,137,59,.06); border-bottom-color: var(--gold); }
+.adm-sess-tab:hover { color: var(--w); }
 
 /* ══════════════════════════════════════
    RESPONSIVE — TABLET (768px+)
@@ -974,7 +1145,7 @@ body.am .qa-bank-btn { display: flex; }
   .wb-tab { font-size: .66rem; padding: 10px 16px; }
 
   /* Workbook questions side by side on wide tablets */
-  .wb-qs { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  .wb-qs { display: flex; flex-direction: column; gap: 3px; }
 
   /* Session items show summary always */
   .s-summary { display: block !important; }
@@ -1056,6 +1227,31 @@ body.am .qa-bank-btn { display: flex; }
   .qa-featured { min-height: 120px; }
 }
 
+/* ── ADMIN SLIDE PREVIEW PANEL ── */
+.adm-preview-wrap { flex: 1; overflow: hidden; position: relative; background: #050505; display: flex; align-items: center; justify-content: center; min-height: 140px; cursor: pointer; }
+.adm-preview-stage { position: relative; overflow: hidden; background: var(--bg); border: 1px solid var(--ln); box-shadow: 0 4px 32px rgba(0,0,0,.6); }
+.adm-preview-stage .slide { display: none; }
+.adm-preview-stage .slide.on { display: flex; }
+.adm-preview-scale { width: 100%; height: 100%; position: relative; }
+.adm-preview-stage { pointer-events: none; }
+.adm-preview-stage .slide { min-height: unset !important; height: 540px !important; width: 960px !important; }
+.adm-preview-label { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); background: rgba(13,13,13,.85); border: 1px solid var(--ln); font-family: var(--fc); font-size: .52rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mu); padding: 3px 10px; white-space: nowrap; backdrop-filter: blur(4px); z-index: 10; pointer-events: none; }
+.adm-preview-sess { position: absolute; top: 8px; left: 8px; background: rgba(184,137,59,.15); border: 1px solid rgba(184,137,59,.3); font-family: var(--fc); font-size: .5rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); padding: 2px 8px; z-index: 10; pointer-events: none; }
+
+/* Preview layout within center column */
+.adm-center-layout { display: flex; flex-direction: column; overflow: hidden; flex: 1; min-height: 0; height: 100%; }
+.adm-preview-area { flex: 0 0 auto; display: flex; flex-direction: column; border-bottom: 1px solid var(--ln); background: #0a0a0a; }
+.adm-preview-toolbar { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--ln); background: var(--bgd); flex-shrink: 0; flex-wrap: wrap; }
+.adm-preview-toolbar .adm-panel-title { flex: 1; }
+.adm-qa-area { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+/* Preview nav controls below the preview */
+.adm-preview-controls { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-top: 1px solid var(--ln); background: var(--bgd); flex-shrink: 0; }
+.adm-preview-info { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.adm-prev-btn, .adm-next-btn { flex: 1; background: var(--bgc); border: 1px solid var(--ln); color: var(--mu); font-family: var(--fc); font-size: .62rem; font-weight: 600; letter-spacing: .06em; padding: 8px 10px; cursor: pointer; transition: all .2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+.adm-prev-btn:hover, .adm-next-btn:hover { border-color: var(--gold); color: var(--w); }
+.adm-next-btn { text-align: right; border-color: rgba(184,137,59,.2); }
+
 /* ── CANVAS ── */
 #pc { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .3; }
 .ci, #sh { position: relative; z-index: 1; }
@@ -1131,11 +1327,16 @@ body.am .qa-bank-btn { display: flex; }
   <div class="c-access fu d4">
     <button class="btn btn-outline" onclick="showModal('seminar')">I Have the Access Code</button>
   </div>
-  <div class="qr-section fu d5">
+  <div class="qr-section fu d5" style="display:flex;gap:32px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
     <div class="qr-wrap">
       <div class="qr-label">Scan to join on your phone</div>
       <div id="qr-canvas-wrap"></div>
       <div class="qr-url" id="qr-url-display"></div>
+    </div>
+    <div class="qr-wrap">
+      <div class="qr-label">Try our Bible study app</div>
+      <div id="qr-apostolic-wrap"></div>
+      <div class="qr-url">apostolicguide.com</div>
     </div>
   </div>
   <div class="c-quote fu d5">Relationships do not create your foundation. They reveal it.</div>
@@ -1215,7 +1416,7 @@ body.am .qa-bank-btn { display: flex; }
 
     
     <div class="s-grid" style="margin-bottom:0">
-      <div class="s-item" onclick="scrollToWB(4)" style="cursor:pointer;grid-column:1/-1;border-color:rgba(184,137,59,.2)">
+      <div class="s-item" onclick="openSS(4)" style="cursor:pointer;grid-column:1/-1;border-color:rgba(184,137,59,.2)">
         <div class="s-time" style="color:var(--gold)">Q &amp; A</div>
         <div style="flex:1">
           <div class="s-label" style="color:var(--gold)">Open Floor</div>
@@ -1226,7 +1427,7 @@ body.am .qa-bank-btn { display: flex; }
         <div class="s-arrow">&rarr;</div>
       </div>
     </div>
-<div id="workbook" class="h-sec" style="margin-top:48px">
+<div id="workbook" class="h-sec" style="margin-top:60px">
       <div class="h-sec-hdr"><span class="h-sec-title">Digital Workbook</span><div class="h-sec-line"></div></div>
       <div class="wb-tabs">
         <button class="wb-tab on" onclick="swTab(0,this)">Session 1<span class="tab-check"></span></button>
@@ -1460,9 +1661,18 @@ body.am .qa-bank-btn { display: flex; }
             <div class="wb-sess-label">Q &amp; A</div>
             <div class="wb-sess-title">Ask a Question</div>
             <div class="wb-sess-desc">Questions go directly to Elder Castaneda &mdash; answered live or personally after</div>
-          <div style="font-size:.78rem;color:var(--mu);line-height:1.55;margin-top:6px;padding-top:6px;border-top:1px solid var(--ln)">What did you hear today that you want to go deeper on? Is there something that hit close to home that you couldn&rsquo;t say out loud? Ask it here. No question is too personal or too simple.</div>
+            <div style="font-size:.78rem;color:var(--mu);line-height:1.55;margin-top:6px;padding-top:6px;border-top:1px solid var(--ln)">What did you hear today that you want to go deeper on? Is there something that hit close to home that you couldn&rsquo;t say out loud? Ask it here. No question is too personal or too simple.</div>
           </div>
-          <button class="btn btn-gold" onclick="openAskDrawer()">Submit a Question</button>
+        </div>
+        <!-- Inline question submission -->
+        <div style="background:var(--bgc);border:1px solid var(--ln);padding:18px 20px;margin-bottom:2px">
+          <div style="font-family:var(--fc);font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Your Question</div>
+          <textarea id="qa-inline-ta" class="wb-ta" placeholder="Type your question here..." style="min-height:80px;margin-bottom:10px" oninput="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--ln)'"></textarea>
+          <div class="wb-row">
+            <label class="wb-anon" onclick="tog(this)"><div class="tog"></div><span>Post anonymously</span></label>
+            <button class="wb-submit" onclick="submitInlineQuestion()">Submit Question</button>
+            <span class="wb-ok" id="qa-inline-ok">&#10003; Sent!</span>
+          </div>
         </div>
         <!-- Live questions feed -->
         <div id="qa-live-feed" style="display:flex;flex-direction:column;gap:2px;margin-bottom:2px">
@@ -1688,43 +1898,40 @@ body.am .qa-bank-btn { display: flex; }
 <!-- ═══ ADMIN DASHBOARD ═══ -->
 <div id="admin-hub" class="scr">
 
-  <!-- TOP CONTROL BAR -->
+  <!-- TOP CONTROL BAR — clean, presentation-focused -->
   <div class="adm-bar">
-    <div class="adm-bar-logo">Built <span>Before</span> Bonded</div>
-    <div class="adm-bar-badge">ADMIN</div>
-    <div class="adm-bar-divider"></div>
 
-    <!-- Session timer -->
-    <div class="adm-bar-stat">
-      <span class="lbl">Session Timer</span>
-      <span class="adm-sess-timer" id="adm-timer">0:00</span>
+    <!-- Timer — most important thing during a session -->
+    <div class="adm-timer-block">
+      <div style="display:flex;flex-direction:column;gap:1px">
+        <span class="adm-timer-lbl">Session</span>
+        <span class="adm-sess-timer" id="adm-timer">0:00</span>
+      </div>
+      <button class="adm-lock-pill" id="adm-lock-btn" onclick="admToggleLock()">&#128275; Unlocked</button>
     </div>
-    <div class="adm-bar-divider"></div>
 
-    <!-- Slide controls -->
-    <button class="adm-ctrl-btn" onclick="admPrev()">&#8249; Prev</button>
-    <div class="adm-bar-stat">
-      <span class="lbl">Slide</span>
-      <span class="val gold" id="adm-slide-pt">—</span>
+    <!-- Slide nav — the main action zone -->
+    <div class="adm-nav-block">
+      <button class="adm-nav-prev" onclick="admPrev()">&#8592; Prev</button>
+      <div class="adm-nav-counter" id="adm-slide-pt">—</div>
+      <button class="adm-nav-next" onclick="admNext()">Next &#8594;</button>
     </div>
-    <button class="adm-ctrl-btn" onclick="admNext()">Next &#8250;</button>
-    <button class="adm-ctrl-btn" id="adm-lock-btn" onclick="admToggleLock()">&#128275; Unlocked</button>
-    <div class="adm-bar-divider"></div>
 
     <!-- Stats -->
-    <div class="adm-bar-stat">
-      <span class="lbl">Attendees</span>
-      <span class="val" id="adm-attendee-count">0</span>
+    <div class="adm-stats-block">
+      <div class="adm-stat">
+        <span class="lbl">In Room</span>
+        <span class="val green" id="adm-attendee-count">0</span>
+      </div>
+      <div class="adm-stat">
+        <span class="lbl">Responses</span>
+        <span class="val gold" id="adm-resp-count">0</span>
+      </div>
+      <div class="adm-stat">
+        <span class="lbl">Questions</span>
+        <span class="val gold" id="adm-q-count">0</span>
+      </div>
     </div>
-    <div class="adm-bar-stat">
-      <span class="lbl">Responses</span>
-      <span class="val gold" id="adm-resp-count">0</span>
-    </div>
-    <div class="adm-bar-stat">
-      <span class="lbl">Questions</span>
-      <span class="val gold" id="adm-q-count">0</span>
-    </div>
-    <div class="adm-bar-divider"></div>
 
     <!-- Projector sync -->
     <div class="adm-sync-pill">
@@ -1732,67 +1939,73 @@ body.am .qa-bank-btn { display: flex; }
       <span id="adm-sync-label">Projector Offline</span>
     </div>
 
-    <!-- Right side actions -->
-    <div class="adm-right">
-      <button class="adm-ctrl-btn" onclick="toggleSound()" id="adm-sound-btn">&#9834; Sound Off</button>
-      <button class="adm-ctrl-btn" onclick="openWall()">&#9641; Wall</button>
-      <button class="adm-ctrl-btn" onclick="openConstellation()">&#10022; Stars</button>
-      <button class="adm-ctrl-btn" onclick="openQAWall()">&#9998; Q Wall</button>
-      <button class="adm-ctrl-btn" onclick="toggleFS()">&#9974; Fullscreen</button>
-      <button class="adm-ctrl-btn" onclick="switchToAttendee()">&#128100; Attendee View</button>
+    <!-- Secondary tools — overflow, right side -->
+    <div class="adm-tools-block">
+      <button class="adm-tool-btn" onclick="admToggleFS()">&#9974; Full</button>
+      <button class="adm-tool-btn" onclick="toggleSound()" id="adm-sound-btn">&#9834; Sound</button>
+      <button class="adm-tool-btn" onclick="openWall()">&#9641; Wall</button>
+      <button class="adm-tool-btn" onclick="openConstellation()">&#10022; Stars</button>
+      <button class="adm-tool-btn" onclick="openQAWall()">&#9998; Q Wall</button>
+      <button class="adm-tool-btn adm-view-btn" onclick="switchToAttendee()">&#128100; Attendee</button>
+      <button class="adm-tool-btn" onclick="adminLogout()" style="color:var(--rl);border-color:rgba(155,69,39,.3)" title="Log out of admin">&#10005; Logout</button>
     </div>
   </div>
 
-  <!-- MAIN GRID -->
+  <!-- MAIN GRID: Q&A (left) | Slide Preview (center) | Responses + Slides (right) -->
   <div class="adm-grid" style="flex:1;overflow:hidden">
 
-    <!-- LEFT: Session selector + slide list + notes -->
+    <!-- LEFT: Q&A Queue — your primary focus during a talk -->
+    <div class="adm-qa-col">
+      <div class="adm-qa-col-hdr">
+        <span class="adm-panel-title">Q &amp; A Queue</span>
+        <span style="font-family:var(--fc);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)" id="adm-q-label">0 questions</span>
+      </div>
+      <div class="adm-qa-col-list">
+        <!-- Featured question at top -->
+        <div class="adm-featured-q" id="adm-featured-display">
+          <div class="adm-featured-lbl">&#9654; Now Answering</div>
+          <div class="adm-featured-text" id="adm-featured-text"></div>
+        </div>
+        <!-- Live Q&A list -->
+        <div id="adm-qa-list"><div class="adm-empty">No questions yet. They appear here as attendees submit.</div></div>
+      </div>
+      <!-- Session launch bar at bottom -->
+      <div class="adm-launch-bar">
+        <span style="font-family:var(--fc);font-size:.52rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);margin-right:2px">Launch:</span>
+        <button class="adm-ctrl-btn" onclick="admOpenSession(0)" style="font-size:.58rem;padding:5px 10px">S1</button>
+        <button class="adm-ctrl-btn" onclick="admOpenSession(1)" style="font-size:.58rem;padding:5px 10px">S2</button>
+        <button class="adm-ctrl-btn" onclick="admOpenSession(2)" style="font-size:.58rem;padding:5px 10px">S3</button>
+        <button class="adm-ctrl-btn" onclick="admOpenSession(3)" style="font-size:.58rem;padding:5px 10px">S4</button>
+        <button class="adm-ctrl-btn" onclick="admOpenSession(4)" style="font-size:.58rem;padding:5px 10px">Q&amp;A</button>
+        <button class="adm-ctrl-btn active" onclick="admResumeSlide()" style="font-size:.58rem;padding:5px 10px">&#9654; Resume</button>
+      </div>
+    </div>
+
+    <!-- CENTER: Slide Preview + Session Tabs + Notes -->
     <div class="adm-slide-panel">
-      <div class="adm-panel-hdr">
-        <span class="adm-panel-title">Presentation</span>
-        <span style="font-family:var(--fc);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)">Tap slide to go there</span>
+      <!-- Session tabs -->
+      <div class="adm-sess-tabs" id="adm-sess-tabs" style="flex-shrink:0">
+        <button class="adm-sess-tab on" onclick="admLoadSess(0,this)">Formation</button>
+        <button class="adm-sess-tab" onclick="admLoadSess(1,this)">Healing</button>
+        <button class="adm-sess-tab" onclick="admLoadSess(2,this)">Wisdom</button>
+        <button class="adm-sess-tab" onclick="admLoadSess(3,this)">Obedience</button>
+        <button class="adm-sess-tab" onclick="admLoadSess(4,this)">Q &amp; A</button>
       </div>
-      <div class="adm-sess-tabs" id="adm-sess-tabs">
-        <button class="adm-sess-tab on" onclick="admLoadSess(0,this)">S1</button>
-        <button class="adm-sess-tab" onclick="admLoadSess(1,this)">S2</button>
-        <button class="adm-sess-tab" onclick="admLoadSess(2,this)">S3</button>
-        <button class="adm-sess-tab" onclick="admLoadSess(3,this)">S4</button>
-      </div>
-      <div class="adm-slide-preview" id="adm-slide-list"></div>
-      <div class="adm-notes-panel">
+      <!-- Preview wrap kept in DOM (JS references it) but hidden -->
+      <div id="adm-preview-wrap" style="display:none"><div id="adm-preview-stage"></div></div>
+      <div id="adm-prev-title" style="display:none"></div>
+      <div id="adm-next-title" style="display:none"></div>
+      <div id="adm-slide-pt2" style="display:none"></div>
+      <div id="adm-preview-label" style="display:none"></div>
+      <div id="adm-slide-list" style="display:none"></div>
+      <!-- Presenter notes — full remaining space -->
+      <div class="adm-notes-panel" style="flex:1;max-height:none;overflow-y:auto">
         <div class="adm-notes-lbl">&#9998; Presenter Notes</div>
         <div class="adm-notes-text" id="adm-notes-text">Select a slide to see your notes.</div>
       </div>
     </div>
 
-    <!-- CENTER: Q&A queue + featured -->
-    <div class="adm-center">
-      <div class="adm-center-top">
-        <div class="adm-panel-hdr" style="padding:0 0 10px;border-bottom:1px solid var(--ln);margin-bottom:12px">
-          <span class="adm-panel-title">Q &amp; A Queue</span>
-          <span style="font-family:var(--fc);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)" id="adm-q-label">0 questions</span>
-        </div>
-        <!-- Currently featured -->
-        <div class="adm-featured-q" id="adm-featured-display">
-          <div class="adm-featured-lbl">&#9654; Now Answering</div>
-          <div class="adm-featured-text" id="adm-featured-text"></div>
-        </div>
-        <!-- Queue -->
-        <div id="adm-qa-list"><div class="adm-empty">No questions yet. They appear here as attendees submit.</div></div>
-      </div>
-      <div class="adm-center-bottom">
-        <div style="font-family:var(--fc);font-size:.56rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);margin-bottom:8px">Quick Launch</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="adm-ctrl-btn" onclick="admOpenSession(0)">&#9654; Session 1</button>
-          <button class="adm-ctrl-btn" onclick="admOpenSession(1)">&#9654; Session 2</button>
-          <button class="adm-ctrl-btn" onclick="admOpenSession(2)">&#9654; Session 3</button>
-          <button class="adm-ctrl-btn" onclick="admOpenSession(3)">&#9654; Session 4</button>
-          <button class="adm-ctrl-btn active" onclick="admResumeSlide()">&#9654; Resume</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Live response feed -->
+    <!-- RIGHT: Live Response Feed -->
     <div class="adm-resp-panel">
       <div class="adm-panel-hdr">
         <span class="adm-panel-title">Live Responses</span>
@@ -1810,6 +2023,7 @@ body.am .qa-bank-btn { display: flex; }
         <div class="adm-empty">Responses appear here in real time.</div>
       </div>
     </div>
+
   </div>
 
 </div>
@@ -1863,8 +2077,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2205,8 +2419,16 @@ const SESSIONS = [
   { t:'te', n:'05', hl:"Sacred <span class='gw'>before shared.</span>", pts:["Sex was created by God. It has order, purpose, weight, and holiness.","God places it inside covenant \u2014 not to withhold joy, but because sacred things need covering.","Genesis 2:24 \u2014 leaving, cleaving, then one flesh. The order is intentional.","<span class='hi'>Purity must be decided before pressure. Some fires you do not play with.</span>"] },
   { t:'wb', hd:'WORKBOOK MOMENT 3', q:'Build Different Commitment', i:"If God has shown you what needs to change, your next step is obedience.", items:["One thing to surrender","One boundary to put in place","One relationship to seek wisdom about","One practical step this week"], ls:4, lc:'Build' },
   { t:'cl', title:'Build different from here.', lines:["You can set a boundary.","You can stop repeating what hurt you.","You can choose obedience over attention.","You can choose wisdom over impulse.","God builds on what you surrender."] },
-  { t:'pr', lbl:'CLOSING PRAYER', title:'Lord, teach me how to build different.', pts:["Guard what You are healing. Give me wisdom in relationships.","Courage to set boundaries. Humility to receive counsel.","Self-control when emotions are strong. Keep me from secrecy and compromise.","Help me choose obedience, wisdom, and purity.","Search my heart. Lead me in the way everlasting."] },
-  { t:'ty' }
+  { t:'pr', lbl:'CLOSING PRAYER', title:'Lord, teach me how to build different.', pts:["Guard what You are healing. Give me wisdom in relationships.","Courage to set boundaries. Humility to receive counsel.","Self-control when emotions are strong. Keep me from secrecy and compromise.","Help me choose obedience, wisdom, and purity.","Search my heart. Lead me in the way everlasting."] }
+]},
+{ tag:'Q & A', name:'ASK ELDER CASTANEDA', slides:[
+  { t:'cover', ew:'Open Floor', arc:'Q &amp; A', sess:'Q &amp; A', title:'Ask a Question', sub:'This is your moment. Nothing is off limits.', meta:[] },
+  { t:'cv', lbl:'OPEN FLOOR', cq:'What is the one question you were afraid to ask today?', cn:'No question is too personal or too small. This is a safe room.' },
+  { t:'cv', lbl:'GOING DEEPER', cq:'What did you hear today that hit closest to home?', cn:'Be honest with yourself first before you say it out loud.' },
+  { t:'cv', lbl:'FOR THE ROOM', cq:'What would you tell your younger self about relationships?', cn:'Wisdom is only valuable when it is shared.' },
+  { t:'cv', lbl:'PRACTICAL STEP', cq:'What is one thing you are committing to change after today?', cn:'Accountability starts with a public declaration.' },
+  { t:'wb', hd:'Q&A / YOUR QUESTIONS', q:'What question do you want Elder Castaneda to answer?', i:'Be specific. The more honest the question the more useful the answer.', items:['What did today confirm about where you are?','What are you still unsure about?','What do you need prayer for?','Is there something you heard today you disagree with?'], ls:5, lc:'Q&A Question' },
+  { t:'pr', lbl:'CLOSING PRAYER', title:'Lord, let what started today not end when we leave this room.', pts:['Seal what You taught. Protect what You revealed.','Give us courage to do the hard things in private.','Let honesty become a habit, not a moment.','Thank You for every person in this room. They showed up.','Send us out different than we came in.'] }
 ]}
 ];
 
@@ -2241,7 +2463,7 @@ function openSS(i) {
   startSessTimer();
   // Update lock btn
   const lb = document.getElementById('lock-btn');
-  if (lb) { lb.textContent = '\u{1F513}'; lb.classList.remove('locked'); }
+  if (lb) { lb.textContent = '\uD83D\uDD13'; lb.classList.remove('locked'); }
 }
 function startSessTimer() {
   sessTimerStart = Date.now();
@@ -2263,6 +2485,7 @@ function closeSlideshow() {
   if (isAdmin) {
     document.getElementById('admin-hub').classList.add('on');
     admUpdateSlideHighlight();
+    requestAnimationFrame(() => { admRenderPreview(); admScalePreview(); });
   } else if (mode === 'hub') {
     document.getElementById('sh').classList.add('on');
   } else {
@@ -2386,6 +2609,7 @@ function goTo(i) {
   // Update admin dashboard if open
   if (document.getElementById('admin-hub').classList.contains('on')) {
     admUpdateSlideHighlight();
+    admRenderPreview();
   }
   // Check if this is a complete or thank you slide
   const thisSlide = SESSIONS[curSess].slides[i];
@@ -2406,7 +2630,7 @@ function toggleLock() {
   slideLocked = !slideLocked;
   const btn = document.getElementById('lock-btn');
   if (btn) {
-    btn.textContent = slideLocked ? '\u{1F512}' : '\u{1F513}';
+    btn.textContent = slideLocked ? '\uD83D\uDD12' : '\uD83D\uDD13';
     btn.classList.toggle('locked', slideLocked);
   }
 }
@@ -2937,6 +3161,49 @@ async function submitQuestion() {
   }, 1200);
 }
 
+async function submitInlineQuestion() {
+  const ta = document.getElementById('qa-inline-ta');
+  const ok = document.getElementById('qa-inline-ok');
+  const text = ta ? ta.value.trim() : '';
+  if (!text) { if (ta) ta.focus(); return; }
+  const anonEl = ta.closest('.wb-panel') ? ta.closest('.wb-panel').querySelector('.tog') : null;
+  const anon = anonEl ? anonEl.classList.contains('on') : false;
+  const name = anon ? 'Anonymous' : (userName || 'Attendee');
+
+  const q = {
+    id: Date.now(),
+    text,
+    name,
+    anonymous: anon,
+    featured: false,
+    ts: new Date().toLocaleTimeString()
+  };
+
+  if (window.SB_URL && window.SB_KEY) {
+    try {
+      await fetch(window.SB_URL + '/rest/v1/questions', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json','apikey':window.SB_KEY,'Authorization':'Bearer '+window.SB_KEY,'Prefer':'return=minimal' },
+        body: JSON.stringify({ question: text, name: q.name, anonymous: anon, submitted_at: new Date().toISOString() })
+      });
+    } catch(e) {}
+  }
+
+  try {
+    const qs = JSON.parse(localStorage.getItem('bbb_qs') || '[]');
+    qs.push(q); localStorage.setItem('bbb_qs', JSON.stringify(qs));
+    questions = qs;
+  } catch(e) {}
+
+  if (ok) ok.classList.add('on');
+  playTone('submit');
+  updateQABadge();
+  renderQALiveFeed();
+  if (ta) ta.value = '';
+  ta.style.borderColor = 'var(--ln)';
+  setTimeout(() => { if (ok) ok.classList.remove('on'); }, 2000);
+}
+
 // ── ASK DRAWER ──
 function openAskDrawer() {
   const d = document.getElementById('ask-drawer');
@@ -3375,6 +3642,8 @@ function showAdminHub() {
   admLoadSess(0, document.querySelector('.adm-sess-tab'));
   admRefreshAll();
   admStartTimer();
+  // Render slide preview after layout settles
+  requestAnimationFrame(() => { admRenderPreview(); admScalePreview(); });
   // Wire sync indicator in admin bar
   setInterval(admRefreshAll, 4000);
 }
@@ -3382,6 +3651,17 @@ function showAdminHub() {
 function switchToAttendee() {
   document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
   document.getElementById('sh').classList.add('on');
+}
+
+function adminLogout() {
+  localStorage.removeItem('bbb_a');
+  localStorage.removeItem('bbb_u');
+  localStorage.removeItem('bbb_name');
+  isAdmin = false;
+  document.body.classList.remove('am', 'named');
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  document.getElementById('sc').classList.add('on');
+  location.reload();
 }
 
 function admStartTimer() {
@@ -3451,9 +3731,8 @@ function admUpdateSlideHighlight() {
   document.querySelectorAll('.adm-slide-thumb').forEach((el, i) => {
     el.classList.toggle('current', admViewSess === curSess && i === curSlide);
   });
-  const note = NOTES[`${curSess}-${curSlide}`] || '';
-  const notesEl = document.getElementById('adm-notes-text');
-  if (notesEl) notesEl.textContent = note || 'No notes for this slide.';
+  // Re-render the full notes panel via admRenderPreview (handles content + notes)
+  admRenderPreview();
   const pt = document.getElementById('adm-slide-pt');
   if (pt) pt.textContent = `${curSlide+1}/${SESSIONS[curSess]?.slides?.length||0}`;
   // Scroll to current slide thumb
@@ -3466,9 +3745,14 @@ function admNext() { nextSlide(); admUpdateSlideHighlight(); }
 function admPrev() { prevSlide(); admUpdateSlideHighlight(); }
 function admToggleLock() {
   toggleLock();
-  const btn = document.getElementById('adm-lock-btn');
-  if (btn) btn.textContent = slideLocked ? '\u{1F512} Locked' : '\u{1F513} Unlocked';
-  if (btn) btn.classList.toggle('danger', slideLocked);
+  const lockText = slideLocked ? '\uD83D\uDD12 Locked' : '\uD83D\uDD13 Unlocked';
+  ['adm-lock-btn','adm-lock-btn2'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.textContent = lockText;
+      btn.classList.toggle('danger', slideLocked);
+    }
+  });
 }
 function admOpenSession(i) {
   openSS(i);
@@ -3582,6 +3866,253 @@ function admRefreshAll() {
   }
 }
 
+
+// ══════════════════════════════════════════════════════
+// ADMIN SLIDE PREVIEW ENGINE
+// ══════════════════════════════════════════════════════
+
+function admRenderPreview() {
+  const stage = document.getElementById('adm-preview-stage');
+  const wrap = document.getElementById('adm-preview-wrap');
+  const scale = null; // removed
+  const sessLabel = document.getElementById('adm-preview-sess');
+  const lbl = document.getElementById('adm-preview-lbl');
+  const label2 = document.getElementById('adm-preview-label');
+  const pt2 = document.getElementById('adm-slide-pt2');
+
+  if (!stage || !SESSIONS[curSess]) return;
+
+  const sess = SESSIONS[curSess];
+  const slide = sess.slides[curSlide];
+  if (!slide) return;
+
+  // Render slide HTML into preview stage
+  const slideHtml = renderSlide(slide, curSlide);
+  stage.innerHTML = slideHtml;
+  const slideEl = stage.querySelector('.slide');
+  if (slideEl) {
+    slideEl.classList.add('on');
+    if (slideEl.classList.contains('sl-sc')) {
+      setTimeout(() => revealScripture(slideEl), 100);
+    }
+  }
+  // Scale stage to fit wrap
+  admScalePreview();
+
+  // Update labels
+  if (sessLabel) sessLabel.textContent = sess.tag || '';
+  if (lbl) lbl.textContent = 'Tap to go fullscreen';
+  if (label2) {
+    const typeNames = { cover:'Cover', qt:'Quote', te:'Teaching', sc:'Scripture',
+      wb:'Workbook', cv:'Discussion', cl:'Closing', pr:'Prayer', ty:'Thank You', sc_complete:'Complete' };
+    label2.textContent = `${typeNames[slide.t] || slide.t} · Slide ${curSlide+1}/${sess.slides.length}`;
+  }
+  if (pt2) pt2.textContent = `${curSlide+1} / ${sess.slides.length}`;
+
+  // Update prev/next buttons with slide titles
+  const prevBtn = document.getElementById('adm-prev-title');
+  const nextBtn = document.getElementById('adm-next-title');
+  const slideTypeNames = { cover:'Cover', qt:'Quote', te:'Teaching', sc:'Scripture', wb:'Workbook', cv:'Discussion', cl:'Closing', pr:'Prayer', ty:'Thank You', sc_complete:'Complete' };
+  const getSlideTitle = (s) => {
+    if (!s) return '—';
+    return (s.title || s.hl || s.q || s.cq || s.clt || s.prt || '').replace(/<[^>]+>/g, '').substring(0, 26) || slideTypeNames[s.t] || s.t;
+  };
+  if (prevBtn) {
+    const prev = curSlide > 0 ? sess.slides[curSlide - 1] : null;
+    prevBtn.textContent = prev ? `← ${getSlideTitle(prev)}` : '←';
+    prevBtn.style.opacity = prev ? '1' : '0.3';
+  }
+  if (nextBtn) {
+    const next = curSlide < sess.slides.length - 1 ? sess.slides[curSlide + 1] : null;
+    nextBtn.textContent = next ? `${getSlideTitle(next)} →` : '→';
+    nextBtn.style.opacity = next ? '1' : '0.3';
+  }
+
+  // Update notes panel with slide content + presenter notes
+  const note = NOTES[`${curSess}-${curSlide}`] || '';
+  const notesEl = document.getElementById('adm-notes-text');
+  if (notesEl) {
+    const typeNames = { cover:'Cover', qt:'Quote', te:'Teaching', sc:'Scripture',
+      wb:'Workbook', cv:'Discussion', cl:'Closing', pr:'Prayer', ty:'Thank You', sc_complete:'Session Complete' };
+    const strip = str => (str||'').replace(/<[^>]+>/g,'').trim();
+    let content = '';
+
+    switch (slide.t) {
+      case 'cover':
+        content = [slide.tag, slide.title, slide.sub].filter(Boolean).map(strip).join('\n');
+        break;
+      case 'qt':
+        content = (slide.lines||[]).map(strip).join(' ') + (slide.attr ? `\n— ${strip(slide.attr)}` : '');
+        break;
+      case 'te':
+        content = strip(slide.hl) + (slide.pts && slide.pts.length ? '\n\n' + slide.pts.map((p,i) => `${i+1}. ${strip(p)}`).join('\n') : '');
+        break;
+      case 'sc':
+        content = `${strip(slide.ref)}\n\n"${strip(slide.text)}"\n\n${strip(slide.tk)}`;
+        break;
+      case 'wb':
+        content = strip(slide.q) + (slide.opts && slide.opts.length ? '\n\n' + slide.opts.map(o => `▪ ${strip(o)}`).join('\n') : '');
+        break;
+      case 'cv':
+        content = strip(slide.ch) + '\n\n' + strip(slide.q) + (slide.n ? `\n\n${strip(slide.n)}` : '');
+        break;
+      case 'cl':
+        content = strip(slide.title) + (slide.lines && slide.lines.length ? '\n\n' + slide.lines.map(l => `• ${strip(l)}`).join('\n') : '');
+        break;
+      case 'pr':
+        content = strip(slide.title) + (slide.pts && slide.pts.length ? '\n\n' + slide.pts.map(p => `• ${strip(p)}`).join('\n') : '');
+        break;
+      case 'sc_complete':
+        content = 'Session complete.';
+        break;
+      case 'ty':
+        content = 'Thank You slide.';
+        break;
+      default:
+        content = strip(slide.title || slide.hl || slide.q || '');
+    }
+
+    const slideTypeLine = `${typeNames[slide.t] || slide.t} · ${SESSIONS[curSess].tag} · Slide ${curSlide+1}/${SESSIONS[curSess].slides.length}`;
+
+    notesEl.innerHTML =
+      `<div class="adm-notes-type">${slideTypeLine}</div>` +
+      (content ? `<div class="adm-notes-section-lbl">SLIDE CONTENT</div><div class="adm-notes-content">${content.replace(/\n/g,'<br>')}</div>` : '') +
+      (note ? `<div class="adm-notes-section-lbl" style="margin-top:10px">PRESENTER NOTES</div><div class="adm-notes-note">${note.replace(/\n/g,'<br>')}</div>` : '<div class="adm-notes-note" style="opacity:.4">No notes for this slide.</div>');
+  }
+}
+
+function admScalePreview() {
+  const wrap = document.getElementById('adm-preview-wrap');
+  const stage = document.getElementById('adm-preview-stage');
+  if (!wrap || !stage) return;
+  const wrapW = wrap.offsetWidth;
+  const wrapH = wrap.offsetHeight;
+  if (!wrapW || !wrapH) return;
+  const targetW = 960, targetH = 540;
+  const s = Math.min(wrapW / targetW, wrapH / targetH) * 0.95;
+  stage.style.width = targetW + 'px';
+  stage.style.height = targetH + 'px';
+  stage.style.position = 'absolute';
+  stage.style.top = '50%';
+  stage.style.left = '50%';
+  stage.style.transform = `translate(-50%, -50%) scale(${s})`;
+  stage.style.transformOrigin = 'center center';
+  stage.style.overflow = 'hidden';
+  stage.style.pointerEvents = 'none';
+}
+
+function admToggleFS() {
+  const ssl = document.getElementById('ssl');
+  const hub = document.getElementById('admin-hub');
+  if (ssl.classList.contains('on')) {
+    // Already fullscreen — close and return to dashboard
+    ssl.classList.remove('on');
+    hub.classList.add('on');
+    document.body.style.overflow = '';
+    if (document.fullscreenElement) document.exitFullscreen();
+  } else {
+    // Open fullscreen slideshow
+    if (!SESSIONS[curSess]) return;
+    hub.classList.remove('on');
+    ssl.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    const s = SESSIONS[curSess];
+    document.getElementById('ss-tag').textContent = s.tag;
+    document.getElementById('ss-name').textContent = s.name;
+    buildSlides(s.slides);
+    renderDots(s.slides.length);
+    goTo(curSlide);
+    // Make slide controls visible for admin
+    const wb = document.getElementById('wall-btn');
+    if (wb) wb.style.display = 'inline-flex';
+    const cb = document.getElementById('const-btn');
+    if (cb) cb.style.display = 'inline-flex';
+    const qwb = document.getElementById('qa-wall-btn');
+    if (qwb) qwb.style.display = 'inline-flex';
+  }
+}
+
+// Override admGoToSlide to also update preview
+const _origAdmGoToSlide = admGoToSlide;
+function admGoToSlide(sessIdx, slideIdx) {
+  if (!document.getElementById('ssl').classList.contains('on')) {
+    // Don't open slideshow overlay — just update state and preview
+    curSess = sessIdx;
+    curSlide = slideIdx;
+    broadcastSlide(sessIdx, slideIdx);
+    admRenderPreview();
+    admUpdateSlideHighlight();
+    // Update lock btn
+    const lb2 = document.getElementById('adm-lock-btn2');
+    if (lb2) lb2.textContent = slideLocked ? '\uD83D\uDD12' : '\uD83D\uDD13';
+  } else {
+    _origAdmGoToSlide(sessIdx, slideIdx);
+    admRenderPreview();
+  }
+}
+
+// Override admOpenSession to update preview instead of opening overlay
+const _origAdmOpenSession = admOpenSession;
+function admOpenSession(i) {
+  curSess = i;
+  curSlide = 0;
+  slideLocked = false;
+  admViewSess = i;
+  admLoadSess(i, document.querySelectorAll('.adm-sess-tab')[i]);
+  admRenderPreview();
+  admUpdateSlideHighlight();
+  admResetTimer();
+  broadcastSlide(i, 0);
+  // Update lock btn
+  const lb = document.getElementById('adm-lock-btn');
+  const lb2 = document.getElementById('adm-lock-btn2');
+  if (lb) { lb.textContent = '\uD83D\uDD13 Unlocked'; lb.classList.remove('danger'); }
+  if (lb2) lb2.textContent = '\uD83D\uDD13';
+}
+
+// Override admNext/admPrev to update preview
+const _origAdmNext = admNext;
+const _origAdmPrev = admPrev;
+function admNext() {
+  if (slideLocked) return;
+  const count = SESSIONS[curSess] ? SESSIONS[curSess].slides.length : 0;
+  if (curSlide < count - 1) {
+    curSlide++;
+    broadcastSlide(curSess, curSlide);
+    admRenderPreview();
+    admUpdateSlideHighlight();
+    if (document.getElementById('ssl').classList.contains('on')) goTo(curSlide);
+  }
+}
+function admPrev() {
+  if (curSlide > 0) {
+    curSlide--;
+    broadcastSlide(curSess, curSlide);
+    admRenderPreview();
+    admUpdateSlideHighlight();
+    if (document.getElementById('ssl').classList.contains('on')) goTo(curSlide);
+  }
+}
+
+// Override admToggleLock to sync both buttons
+const _origAdmToggleLock = admToggleLock;
+function admToggleLock() {
+  toggleLock();
+  const lb = document.getElementById('adm-lock-btn');
+  const lb2 = document.getElementById('adm-lock-btn2');
+  const locked = slideLocked;
+  if (lb) { lb.textContent = locked ? '\uD83D\uDD12 Locked' : '\uD83D\uDD13 Unlocked'; lb.classList.toggle('danger', locked); }
+  if (lb2) lb2.textContent = locked ? '\uD83D\uDD12' : '\uD83D\uDD13';
+}
+
+// Resize preview when window resizes
+window.addEventListener('resize', () => {
+  if (document.getElementById('admin-hub') &&
+      document.getElementById('admin-hub').classList.contains('on')) {
+    admScalePreview();
+  }
+});
+
 function updateDayProgress() {
   const h = new Date().getHours() + new Date().getMinutes()/60;
   document.querySelectorAll('.dp-item').forEach(item => {
@@ -3648,9 +4179,9 @@ function getLocalResponses() {
 
 // ── QR CODE ──
 function initQR() {
-  const url = window.location.href.split('?')[0].split('#')[0];
+  const url = 'https://builtbeforebonded.vercel.app';
   const urlEl = document.getElementById('qr-url-display');
-  if (urlEl) urlEl.textContent = url.replace('https://','').replace('http://','');
+  if (urlEl) urlEl.textContent = 'builtbeforebonded.vercel.app';
   const wrap = document.getElementById('qr-canvas-wrap');
   if (!wrap) return;
 
@@ -3660,24 +4191,50 @@ function initQR() {
   script.onload = () => {
     wrap.innerHTML = '';
     const container = document.createElement('div');
-    container.style.cssText = 'background:#171717;padding:10px;border:1px solid #2A2A2A;display:inline-block';
+    container.style.cssText = 'background:#171717;padding:10px;border:1px solid #2A2A2A;display:inline-block;line-height:0';
     wrap.appendChild(container);
     try {
       new QRCode(container, {
         text: url,
-        width: 120,
-        height: 120,
+        width: 160,
+        height: 160,
         colorDark: '#B8893B',
         colorLight: '#171717',
         correctLevel: QRCode.CorrectLevel.M
       });
-      // Style the generated img/canvas
       setTimeout(() => {
-        const el = container.querySelector('img, canvas');
-        if (el) { el.style.display = 'block'; el.style.width = '120px'; el.style.height = '120px'; }
-      }, 100);
+        const table = container.querySelector('table');
+        if (table) table.style.display = 'none';
+        const el = container.querySelector('img');
+        if (el) { el.style.cssText = 'display:block;width:160px;height:160px;'; }
+      }, 200);
     } catch(e) {
       wrap.innerHTML = '';
+    }
+
+    // Second QR — Apostolic Guide
+    const wrap2 = document.getElementById('qr-apostolic-wrap');
+    if (wrap2) {
+      wrap2.innerHTML = '';
+      const c2 = document.createElement('div');
+      c2.style.cssText = 'background:#171717;padding:10px;border:1px solid #2A2A2A;display:inline-block;line-height:0';
+      wrap2.appendChild(c2);
+      try {
+        new QRCode(c2, {
+          text: 'https://apostolicguide.com',
+          width: 160,
+          height: 160,
+          colorDark: '#B8893B',
+          colorLight: '#171717',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        setTimeout(() => {
+          const table = c2.querySelector('table');
+          if (table) table.style.display = 'none';
+          const el = c2.querySelector('img');
+          if (el) { el.style.cssText = 'display:block;width:160px;height:160px;'; }
+        }, 200);
+      } catch(e) { wrap2.innerHTML = ''; }
     }
   };
   script.onerror = () => {
@@ -3715,7 +4272,6 @@ let cwAnimFrame = null;
 
 function openConstellation() {
   document.getElementById('constellation-wall').classList.add('on');
-  // Double rAF ensures the browser has painted the flex layout before we measure
   requestAnimationFrame(() => requestAnimationFrame(() => {
   // Auto-select current session if slideshow is open
     if (document.getElementById('ssl').classList.contains('on') && curSess >= 0) {
@@ -3736,21 +4292,11 @@ function closeConstellation() {
 
 // Resize constellation on orientation change
 window.addEventListener('resize', () => {
-  const cv = document.getElementById('constellation-cv');
-  if (!cv || !document.getElementById('constellation-wall').classList.contains('on')) return;
-  const parent = cv.parentElement;
-  cv.width = parent ? parent.offsetWidth : innerWidth;
-  cv.height = Math.max(200, innerHeight - 80);
+  if (!document.getElementById('constellation-wall').classList.contains('on')) return;
   startConstellation();
 });
 window.addEventListener('orientationchange', () => {
-  setTimeout(() => {
-    const cv = document.getElementById('constellation-cv');
-    if (!cv || !document.getElementById('constellation-wall').classList.contains('on')) return;
-    cv.width = innerWidth;
-    cv.height = Math.max(200, innerHeight - 80);
-    startConstellation();
-  }, 300);
+  setTimeout(startConstellation, 350);
 });
 function cwFilter(btn) {
   document.querySelectorAll('.cw-filter').forEach(b => b.classList.remove('on'));
@@ -3762,20 +4308,19 @@ function cwFilter(btn) {
 function startConstellation() {
   const cv = document.getElementById('constellation-cv');
   if (!cv) return;
-  // Nuclear sizing — force exact pixel dimensions from viewport
-  const hdr = document.querySelector('#constellation-wall .cw-header');
-  const hdrH = hdr ? hdr.offsetHeight : 54;
-  const W = Math.floor(window.innerWidth);
-  const H = Math.floor(window.innerHeight - hdrH);
-  // Set both CSS and canvas pixel dimensions
-  cv.style.position = 'absolute';
-  cv.style.left = '0';
-  cv.style.top = hdrH + 'px';
-  cv.style.width = W + 'px';
-  cv.style.height = H + 'px';
+  // Simple, reliable sizing: match the wall's actual rendered size
+  const wall = document.getElementById('constellation-wall');
+  if (!wall || !wall.classList.contains('on')) return;
+  const rect = wall.getBoundingClientRect();
+  const hdr = wall.querySelector('.cw-header');
+  const hdrH = hdr ? hdr.getBoundingClientRect().height : 54;
+  const W = Math.floor(rect.width) || window.innerWidth;
+  const H = Math.floor(rect.height - hdrH) || (window.innerHeight - hdrH);
   cv.width = W;
   cv.height = H;
-  if (cv.width < 100 || cv.height < 100) { setTimeout(startConstellation, 150); return; }
+  cv.style.width = W + 'px';
+  cv.style.height = H + 'px';
+  if (cv.width < 50 || cv.height < 50) { setTimeout(startConstellation, 100); return; }
   const cx = cv.getContext('2d');
 
   // Get words from responses
@@ -3784,16 +4329,40 @@ function startConstellation() {
 
   // Build word frequency map
   const freq = {};
-  const stopWords = new Set(['the','and','a','an','i','to','of','in','my','that','is','for','it','me','was','have','not','but','be','are','with','this','do','we','so','on','at','as','they','or','can','if','what','you','he','she','how','all','their','just','has','very','up','one','its','when','by','from','about','into','there','who','what','out','more','no','will','than','your','our']);
+  const stopWords = new Set([
+    'the','and','a','an','i','to','of','in','my','that','is','for','it','me','was','have','not',
+    'but','be','are','with','this','do','we','so','on','at','as','they','or','can','if','what',
+    'you','he','she','how','all','their','just','has','very','up','one','its','when','by','from',
+    'about','into','there','who','out','more','no','will','than','your','our','been','get','got',
+    'had','him','his','her','them','then','than','these','those','some','like','just','also',
+    'really','dont','cant','wont','its','ive','im','its','were','when','where','which','while',
+    'would','could','should','may','might','must','need','want','feel','felt','think','know',
+    'said','say','see','saw','going','come','came','back','time','make','made','take','took',
+    'even','still','much','many','long','well','way','now','here','day','good','great','think',
+    'because','being','after','before','again','most','only','other','over','same','such','used',
+    'yeah','okay','yes','nope','sure','right','left','let','put','set','show','tell','told'
+  ]);
 
   data.forEach(r => {
     if (!r.response) return;
-    r.response.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).forEach(w => {
-      if (w.length > 3 && !stopWords.has(w)) freq[w] = (freq[w] || 0) + 1;
-    });
+    r.response.toLowerCase()
+      .replace(/[^a-z\s'-]/g, '')
+      .replace(/[-']/g, '')
+      .split(/\s+/)
+      .forEach(w => {
+        w = w.trim();
+        if (w.length >= 4 && !stopWords.has(w) && /^[a-z]+$/.test(w)) {
+          freq[w] = (freq[w] || 0) + 1;
+        }
+      });
   });
 
-  const words = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 60);
+  // Only show words that appear more than once, sorted by frequency
+  const minFreq = Math.max(1, data.length > 5 ? 2 : 1);
+  const words = Object.entries(freq)
+    .filter(([w, c]) => c >= minFreq)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 50);
   // Validate canvas has real dimensions before drawing
   if (cv.width < 50 || cv.height < 50) {
     // Canvas not ready - retry after layout
@@ -3808,12 +4377,12 @@ function startConstellation() {
     cx.font = '700 14px "Barlow Condensed", sans-serif';
     cx.textAlign = 'center';
     cx.textBaseline = 'middle';
-    cx.fillText('Responses will appear here as attendees submit workbook answers', cv.width/2, cv.height/2);
+    cx.fillText('Not enough responses yet — words appear as themes emerge across submissions', cv.width/2, cv.height/2);
     return;
   }
 
   const maxFreq = words[0][1];
-  const W = cv.width, H = cv.height;
+  // W and H already set above
 
   // Place words in a spiral
   // Measure each word and place with Archimedean spiral, no overlap
