@@ -2372,8 +2372,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -3082,7 +3082,7 @@ function handleLocalSyncEvent(message = {}) {
     return;
   }
   if (event === 'feature-question') {
-    if (isProjector) handleFeaturedQuestion(payload);
+    handleFeaturedQuestion(payload);
     return;
   }
   if (event === 'dismiss-question') {
@@ -3291,14 +3291,24 @@ function initPresenterBroadcast() {
       config: { broadcast: { self: false } }
     });
 
-    channel.subscribe(status => {
-      if (status === 'SUBSCRIBED') {
-        realtimeChannel = channel;
-        updateSyncIndicator(true);
-        // Announce presence
-        channel.send({ type: 'broadcast', event: 'presenter-connected', payload: {} });
-      }
-    });
+    channel
+      .on('broadcast', { event: 'feature-question' }, ({ payload }) => {
+        handleFeaturedQuestion(payload || {});
+      })
+      .on('broadcast', { event: 'show-qa-wall' }, ({ payload }) => {
+        receiveQAWallPayload(payload || {});
+      })
+      .on('broadcast', { event: 'close-qa-wall' }, () => {
+        closeQAWall({ fromBroadcast: true });
+      })
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED') {
+          realtimeChannel = channel;
+          updateSyncIndicator(true);
+          // Announce presence
+          channel.send({ type: 'broadcast', event: 'presenter-connected', payload: {} });
+        }
+      });
 
     // Disconnect notification
     window.addEventListener('beforeunload', () => {
@@ -3483,6 +3493,15 @@ function initAttendeeFollow() {
       })
       .on('broadcast', { event: 'close-wall' }, () => {
         closeWall();
+      })
+      .on('broadcast', { event: 'show-qa-wall' }, ({ payload }) => {
+        receiveQAWallPayload(payload || {});
+      })
+      .on('broadcast', { event: 'close-qa-wall' }, () => {
+        closeQAWall({ fromBroadcast: true });
+      })
+      .on('broadcast', { event: 'feature-question' }, ({ payload }) => {
+        handleFeaturedQuestion(payload || {});
       })
       .on('broadcast', { event: 'presenter-connected' }, () => {
         attendeeFollowing = true;
@@ -3812,6 +3831,9 @@ function loadQuestions() {
   let qs = [];
   try { qs = JSON.parse(localStorage.getItem('bbb_qs') || '[]'); } catch(e) {}
   questions = qs;
+  if ((featuredQId === null || featuredQId === undefined) && localStorage.getItem('bbb_featured_qid')) {
+    featuredQId = localStorage.getItem('bbb_featured_qid');
+  }
   renderQACards();
   renderQALiveFeed();
   updateQABadge();
@@ -3934,6 +3956,7 @@ function featureQuestion(id) {
   }
   if (!q) return;
   featuredQId = q.id;
+  try { localStorage.setItem('bbb_featured_qid', String(featuredQId)); } catch(e) {}
 
   updateQAWallFeaturedDisplay(q);
 
@@ -3961,17 +3984,16 @@ function featureQuestion(id) {
   }
 }
 
-// Handle featured question on projector / attendee side
+// Handle featured question on projector / attendee / secondary admin side
 function handleFeaturedQuestion(payload = {}) {
-  if (!isProjector) return;
-
-  // Keep projector state in sync with admin.
+  // Keep every open Q&A wall in sync with the canonical featured question.
   if (Array.isArray(payload.questions)) {
     questions = payload.questions;
     try { localStorage.setItem('bbb_qs', JSON.stringify(questions)); } catch(e) {}
   }
   if (payload.featuredQId !== undefined) featuredQId = payload.featuredQId;
   else if (payload.id !== undefined) featuredQId = payload.id;
+  try { if (featuredQId !== undefined && featuredQId !== null) localStorage.setItem('bbb_featured_qid', String(featuredQId)); } catch(e) {}
 
   const wall = document.getElementById('qa-wall');
   const wallIsOpen = wall && wall.classList.contains('on');
@@ -3991,7 +4013,10 @@ function handleFeaturedQuestion(payload = {}) {
     return;
   }
 
-  // Otherwise, use a full-screen featured question overlay above the slide.
+  // Otherwise, projector can use a full-screen featured question overlay above the slide.
+  // Admin/attendee app screens should only update their Q&A wall when it is open.
+  if (!isProjector) return;
+
   const existing = document.getElementById('feat-q-overlay');
   if (existing) existing.remove();
 
