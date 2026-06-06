@@ -804,20 +804,20 @@ body.am #ssl .presenter-bar { display: block; }
 .lock-btn.locked { border-color: var(--rl); color: var(--rl); }
 
 /* ── RESPONSE WALL ── */
-#response-wall { position: fixed; inset: 0; z-index: 2000; background: var(--bg); display: none; flex-direction: column; }
+#response-wall { position: fixed; inset: 0; z-index: 10040; background: var(--bg); display: none; flex-direction: column; }
 #response-wall.on { display: flex; }
-.rw-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--ln); background: var(--bgd); }
-.rw-title { font-family: var(--fd); font-size: 1.4rem; color: var(--w); letter-spacing: .04em; text-transform: uppercase; }
+.rw-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 36px; border-bottom: 1px solid var(--ln); background: var(--bgd); }
+.rw-title { font-family: var(--fd); font-size: clamp(2rem, 3vw, 3.8rem); color: var(--w); letter-spacing: .04em; text-transform: uppercase; }
 .rw-title span { color: var(--gold); }
 .rw-controls { display: flex; gap: 8px; align-items: center; }
 .rw-filter { background: var(--bgc); border: 1px solid var(--ln); color: var(--mu); font-family: var(--fc); font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 6px 11px; cursor: pointer; transition: all .2s; }
 .rw-filter.on { border-color: var(--gold); color: var(--gold); background: rgba(184,137,59,.07); }
-.rw-body { flex: 1; overflow-y: auto; padding: 24px; }
-.rw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-.rw-card { background: var(--bgd); border: 1px solid var(--ln); padding: 24px 28px; animation: fuUp .5s ease; }
-.rw-card-cat { font-family: var(--fc); font-size: .65rem; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
-.rw-card-text { font-family: var(--fc); font-size: 1.1rem; color: var(--w); line-height: 1.55; }
-.rw-card-name { font-family: var(--fc); font-size: .65rem; color: var(--mu); margin-top: 10px; }
+.rw-body { flex: 1; overflow-y: auto; padding: clamp(36px, 5vw, 72px); }
+.rw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: clamp(18px, 2vw, 30px); }
+.rw-card { background: var(--bgd); border: 1px solid var(--ln); padding: clamp(28px, 3vw, 48px); animation: fuUp .5s ease; }
+.rw-card-cat { font-family: var(--fc); font-size: clamp(.8rem, 1vw, 1.05rem); font-weight: 700; letter-spacing: .17em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+.rw-card-text { font-family: var(--fc); font-size: clamp(1.5rem, 2vw, 2.35rem); color: var(--w); line-height: 1.35; }
+.rw-card-name { font-family: var(--fc); font-size: clamp(.8rem, 1vw, 1rem); color: var(--mu); margin-top: 16px; letter-spacing:.08em; text-transform:uppercase; }
 .rw-empty { font-family: var(--fc); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--mu); text-align: center; padding: 60px 0; }
 
 /* ── SESSION COMPLETE CARD ── */
@@ -899,7 +899,7 @@ body.projector-mode #sh { background: var(--bg); }
 #constellation-wall { display: none !important; }
 .adm-tool-btn[onclick*="openConstellation"] { display: none !important; }
 #const-btn { display: none !important; }
-.projector-wait { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 500; }
+.projector-wait { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 10070; }
 .projector-wait.hidden { display: none; }
 .pw-title { font-family: var(--fd); line-height: .88; text-transform: uppercase; margin-bottom: 8px; }
 .pw-title .t-built  { display: block; font-size: clamp(52px,9vw,120px); color: var(--w); }
@@ -1042,7 +1042,7 @@ body.named .slide-note-wrap { display: block; }
 }
 
 /* ── Q&A WALL (constellation style) ── */
-#qa-wall { position: fixed; inset: 0; z-index: 3000; background: #0D0D0D; display: none; flex-direction: column; }
+#qa-wall { position: fixed; inset: 0; z-index: 10060; background: #0D0D0D; display: none; flex-direction: column; }
 #qa-wall.on { display: flex; }
 
 /* Projector temporary overlays.
@@ -1056,6 +1056,9 @@ body.projector-mode.wall-open .proj-ctrl-bar {
   transform: translateY(100%) !important;
   pointer-events: none !important;
 }
+body.projector-mode #response-wall .rw-grid { grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); }
+body.projector-mode #response-wall .rw-card-text { font-size: clamp(2rem, 3vw, 3.1rem); }
+body.projector-mode #response-wall .rw-body { padding: clamp(56px, 6vw, 96px); }
 .qa-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid #2A2A2A; background: #171717; flex-shrink: 0; }
 .qa-title { font-family: 'Bebas Neue', Impact, sans-serif; font-size: 1.4rem; color: #F1EEE7; letter-spacing: .04em; text-transform: uppercase; }
 .qa-title span { color: #B8893B; }
@@ -2235,6 +2238,7 @@ body.am .qa-bank-btn { display: flex; }
       <button class="adm-tool-btn" onclick="openWall()">&#9641; Wall</button>
       <button class="adm-tool-btn" onclick="openConstellation()">&#10022; Stars</button>
       <button class="adm-tool-btn" onclick="openQAWall()">&#9998; Q Wall</button>
+      <button class="adm-tool-btn" onclick="adminGoHome()">&#8962; Home</button>
       <button class="adm-tool-btn" onclick="killFeaturedQuestion()" style="color:var(--rl);border-color:rgba(155,69,39,.3)" title="Kill featured question overlay on projector">&#10005; Kill Q</button>
       <button class="adm-tool-btn adm-view-btn" onclick="switchToAttendee()">&#128100; Attendee</button>
       <button class="adm-tool-btn" onclick="confirmResetSession()" style="color:var(--rl);border-color:rgba(155,69,39,.3)" title="Reset all session data">&#8635; Reset</button>
@@ -2368,8 +2372,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2738,12 +2742,7 @@ const SESSIONS = [
 ]},
 { tag:'Q & A', name:'ASK ELDER CASTANEDA', slides:[
   { t:'cover', ew:'Open Floor', arc:'Q &amp; A', sess:'Q &amp; A', title:'Ask a Question', sub:'This is your moment. Nothing is off limits.', meta:[] },
-  { t:'cv', lbl:'OPEN FLOOR', cq:'What is the one question you were afraid to ask today?', cn:'No question is too personal or too small. This is a safe room.' },
-  { t:'cv', lbl:'GOING DEEPER', cq:'What did you hear today that hit closest to home?', cn:'Be honest with yourself first before you say it out loud.' },
-  { t:'cv', lbl:'FOR THE ROOM', cq:'What would you tell your younger self about relationships?', cn:'Wisdom is only valuable when it is shared.' },
-  { t:'cv', lbl:'PRACTICAL STEP', cq:'What is one thing you are committing to change after today?', cn:'Accountability starts with a public declaration.' },
-  { t:'wb', hd:'Q&A / YOUR QUESTIONS', q:'What question do you want Elder Castaneda to answer?', i:'Be specific. The more honest the question the more useful the answer.', items:['What did today confirm about where you are?','What are you still unsure about?','What do you need prayer for?','Is there something you heard today you disagree with?'], ls:5, lc:'Q&A Question' },
-  { t:'pr', lbl:'CLOSING PRAYER', title:'Lord, let what started today not end when we leave this room.', pts:['Seal what You taught. Protect what You revealed.','Give us courage to do the hard things in private.','Let honesty become a habit, not a moment.','Thank You for every person in this room. They showed up.','Send us out different than we came in.'] }
+  { t:'wb', hd:'Q&A / YOUR QUESTIONS', q:'What question do you want Elder Castaneda to answer?', i:'Be specific. The more honest the question the more useful the answer.', items:['What did today confirm about where you are?','What are you still unsure about?','What do you need prayer for?','Is there something you heard today you disagree with?'], ls:5, lc:'Q&A Question' }
 ]}
 ];
 
@@ -2875,7 +2874,7 @@ function renderSlide(s, i) {
         'Baggage':     's2q1', 'Wound':    's2q2', 'Pattern':   's2q3',
         'Stewardship': 's3q1', 'Discipline':'s3q2', 'Audit':    's3q3',
         'Boundary':    's4q1', 'Red':       's4q2', 'Sacred':   's4q3', 'Build': 's4q4',
-        'Overall':     'eod1', 'Biggest':   'eod2', 'One':      'eod3', 'Personal': 'eod4',
+        'Overall':     'eod1', 'Biggest':   'eod2', 'One':      'eod3', 'Personal': 'eod4', 'Q&A': 'qa',
       };
       const wbKey = Object.keys(wbKeyMap).find(k => s.lc && s.lc.includes(k));
       const resolvedKey = wbKey ? wbKeyMap[wbKey] : null;
@@ -3031,6 +3030,70 @@ const NOTES = {
 // ══════════════════════════════════════════════════════
 let realtimeChannel = null;
 let projectorConnected = false;
+const BBB_TAB_ID = 'tab_' + Math.random().toString(36).slice(2) + Date.now();
+let bbbBus = null;
+
+function initLocalSync() {
+  try {
+    if ('BroadcastChannel' in window) {
+      bbbBus = new BroadcastChannel('bbb_live_sync');
+      bbbBus.onmessage = (event) => handleLocalSyncEvent(event.data || {});
+    }
+  } catch(e) {}
+  window.addEventListener('storage', (event) => {
+    if (event.key !== 'bbb_live_sync_event' || !event.newValue) return;
+    try { handleLocalSyncEvent(JSON.parse(event.newValue)); } catch(e) {}
+  });
+}
+
+function emitLocalSync(event, payload = {}) {
+  const message = { event, payload, from: BBB_TAB_ID, t: Date.now() };
+  try { if (bbbBus) bbbBus.postMessage(message); } catch(e) {}
+  try { localStorage.setItem('bbb_live_sync_event', JSON.stringify(message)); } catch(e) {}
+}
+
+function handleLocalSyncEvent(message = {}) {
+  if (!message || message.from === BBB_TAB_ID) return;
+  const event = message.event;
+  const payload = message.payload || {};
+
+  if (event === 'slide-change') {
+    if (isProjector) handleProjectorSlideChange(payload);
+    return;
+  }
+  if (event === 'projector-home') {
+    if (isProjector) showProjectorHome();
+    return;
+  }
+  if (event === 'show-wall') {
+    if (isProjector) openWall({ fromBroadcast: true });
+    return;
+  }
+  if (event === 'close-wall') {
+    if (isProjector) closeWall({ fromBroadcast: true });
+    return;
+  }
+  if (event === 'show-qa-wall') {
+    if (isProjector) receiveQAWallPayload(payload);
+    return;
+  }
+  if (event === 'close-qa-wall') {
+    if (isProjector) closeQAWall({ fromBroadcast: true });
+    return;
+  }
+  if (event === 'feature-question') {
+    if (isProjector) handleFeaturedQuestion(payload);
+    return;
+  }
+  if (event === 'dismiss-question') {
+    if (isProjector) {
+      const ov = document.getElementById('feat-q-overlay');
+      if (ov) ov.remove();
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', initLocalSync);
 
 function initRealtimeSync() {
   if (!window.SB_URL || !window.SB_KEY) {
@@ -3106,6 +3169,9 @@ function initProjectorMode() {
       .on('broadcast', { event: 'close-qa-wall' }, () => {
         closeQAWall({ fromBroadcast: true });
       })
+      .on('broadcast', { event: 'projector-home' }, () => {
+        showProjectorHome();
+      })
       .subscribe(status => {
         if (status === 'SUBSCRIBED') {
           const dot = document.getElementById('pw-dot');
@@ -3145,6 +3211,35 @@ function setProjectorStatus(connected) {
     if (dot) dot.classList.remove('connected');
     if (txt) txt.textContent = 'Presenter disconnected — waiting...';
   }
+}
+
+function showProjectorHome() {
+  const responseWall = document.getElementById('response-wall');
+  const qaWall = document.getElementById('qa-wall');
+  const ssl = document.getElementById('ssl');
+  const wait = document.getElementById('projector-wait');
+  const featured = document.getElementById('feat-q-overlay');
+  if (responseWall) responseWall.classList.remove('on');
+  if (qaWall) qaWall.classList.remove('on');
+  if (featured) featured.remove();
+  document.body.classList.remove('wall-open');
+  if (ssl) ssl.classList.remove('on');
+  if (wait) wait.classList.remove('hidden');
+  curSess = 0;
+  curSlide = 0;
+}
+
+function adminGoHome() {
+  emitLocalSync('projector-home', {});
+  if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'projector-home', payload: {} });
+  const ssl = document.getElementById('ssl');
+  if (ssl) ssl.classList.remove('on');
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  const admin = document.getElementById('admin-hub');
+  if (admin) admin.classList.add('on');
+  document.body.style.overflow = '';
+  admUpdateSlideHighlight();
+  requestAnimationFrame(() => { admRenderPreview(); admScalePreview(); });
 }
 
 // ── PROJECTOR CONTROL BAR AUTO-HIDE ──
@@ -3215,7 +3310,8 @@ function initPresenterBroadcast() {
 }
 
 function broadcastSlide(sess, slide) {
-  if (!realtimeChannel || !isAdmin) return;
+  if (!isAdmin) return;
+  if (!realtimeChannel) { emitLocalSync('slide-change', { sess, slide }); return; }
   // Flash sync indicator
   const dot = document.getElementById('sync-dot');
   if (dot) {
@@ -3223,10 +3319,12 @@ function broadcastSlide(sess, slide) {
     dot.classList.add('sending');
     setTimeout(() => { dot.classList.remove('sending'); dot.classList.add('live'); }, 300);
   }
+  const payload = { sess, slide };
+  emitLocalSync('slide-change', payload);
   realtimeChannel.send({
     type: 'broadcast',
     event: 'slide-change',
-    payload: { sess, slide }
+    payload
   });
 }
 
@@ -3672,11 +3770,13 @@ function openQAWall(opts = {}) {
 
   // Broadcast the current question bank to the projector.
   // The projector receives a snapshot so it does not need shared localStorage.
-  if (isAdmin && realtimeChannel && !opts.fromBroadcast) {
-    realtimeChannel.send({
+  if (isAdmin && !opts.fromBroadcast) {
+    const payload = { questions: questions || [], featuredQId: featuredQId || null };
+    emitLocalSync('show-qa-wall', payload);
+    if (realtimeChannel) realtimeChannel.send({
       type: 'broadcast',
       event: 'show-qa-wall',
-      payload: { questions: questions || [], featuredQId: featuredQId || null }
+      payload
     });
   }
 }
@@ -3685,8 +3785,9 @@ function closeQAWall(opts = {}) {
   if (wall) wall.classList.remove('on');
   restoreWallReturnState();
 
-  if (isAdmin && realtimeChannel && !opts.fromBroadcast) {
-    realtimeChannel.send({ type: 'broadcast', event: 'close-qa-wall', payload: {} });
+  if (isAdmin && !opts.fromBroadcast) {
+    emitLocalSync('close-qa-wall', {});
+    if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'close-qa-wall', payload: {} });
   }
 }
 function receiveQAWallPayload(payload = {}) {
@@ -3741,9 +3842,15 @@ function renderQACards() {
   if (countLabel) countLabel.textContent = questions.length + ' question' + (questions.length !== 1 ? 's' : '');
 
   if (!questions.length) {
-    container.innerHTML = '<div class="qa-empty">No questions yet. Attendees can submit using the Ask a Question button.</div>';
+    const emptyHtml = '<div class="qa-empty">No questions yet. Attendees can submit using the Ask a Question button.</div>';
+    if (container.innerHTML !== emptyHtml) container.innerHTML = emptyHtml;
+    container.dataset.sig = 'empty';
     return;
   }
+
+  const sig = questions.map(q => `${q.id}:${q.text}:${q.id === featuredQId}`).join('|') + `|admin:${isAdmin}`;
+  if (container.dataset.sig === sig) return;
+  container.dataset.sig = sig;
 
   container.innerHTML = questions.map((q, i) => `
     <div class="qa-card${q.id === featuredQId ? ' featured' : ''}" onclick="${isAdmin ? `featureQuestion(${q.id})` : ''}">
@@ -3780,11 +3887,13 @@ function featureQuestion(id) {
   playTone('slide');
 
   // Broadcast to projector if connected
-  if (realtimeChannel && isAdmin) {
-    realtimeChannel.send({
+  if (isAdmin) {
+    const payload = { text: q.text, name: q.anonymous ? 'Anonymous' : q.name };
+    emitLocalSync('feature-question', payload);
+    if (realtimeChannel) realtimeChannel.send({
       type: 'broadcast',
       event: 'feature-question',
-      payload: { text: q.text, name: q.anonymous ? 'Anonymous' : q.name }
+      payload
     });
   }
 }
@@ -3825,7 +3934,7 @@ async function pollQuestions() {
     });
     const data = await r.json();
     if (!Array.isArray(data)) return;
-    questions = data.map((q, i) => ({
+    const nextQuestions = data.map((q, i) => ({
       id: q.id,
       text: q.question,
       name: q.anonymous ? 'Anonymous' : (q.name || 'Attendee'),
@@ -3833,8 +3942,14 @@ async function pollQuestions() {
       featured: false,
       ts: new Date(q.submitted_at).toLocaleTimeString()
     }));
+    const oldSig = questions.map(q => `${q.id}:${q.text}`).join('|');
+    const newSig = nextQuestions.map(q => `${q.id}:${q.text}`).join('|');
+    if (oldSig === newSig) return;
+    questions = nextQuestions;
     try { localStorage.setItem('bbb_qs', JSON.stringify(questions)); } catch(e) {}
     updateQABadge();
+    renderQALiveFeed();
+    admRenderQA();
     if (document.getElementById('qa-wall').classList.contains('on')) renderQACards();
   } catch(e) {}
 }
@@ -4730,7 +4845,7 @@ function restoreWallReturnState() {
   goTo(wallReturnState.slide);
   requestAnimationFrame(() => { scaleSlides(); setTimeout(scaleSlides, 80); });
 }
-function openWall() {
+function openWall(opts = {}) {
   rememberWallReturnState();
   document.body.classList.add('wall-open');
   document.getElementById('response-wall').classList.add('on');
@@ -4745,16 +4860,18 @@ function openWall() {
   }
   renderWall();
   // Broadcast to projector and attendees
-  if (isAdmin && realtimeChannel) {
-    realtimeChannel.send({ type: 'broadcast', event: 'show-wall', payload: {} });
+  if (isAdmin && !opts.fromBroadcast) {
+    emitLocalSync('show-wall', {});
+    if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'show-wall', payload: {} });
   }
 }
-function closeWall() {
+function closeWall(opts = {}) {
   document.getElementById('response-wall').classList.remove('on');
   restoreWallReturnState();
   // Broadcast close to projector
-  if (isAdmin && realtimeChannel) {
-    realtimeChannel.send({ type: 'broadcast', event: 'close-wall', payload: {} });
+  if (isAdmin && !opts.fromBroadcast) {
+    emitLocalSync('close-wall', {});
+    if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'close-wall', payload: {} });
   }
 }
 function filterWall(btn) {
@@ -4771,11 +4888,16 @@ function renderWall() {
   // Filter out non-substantive entries
   data = data.filter(r => r.response && r.response.length > 5);
   if (!data.length) {
-    grid.innerHTML = '<div class="rw-empty">No responses yet. Responses appear as attendees submit their workbooks.</div>';
+    const emptyHtml = '<div class="rw-empty">No responses yet. Responses appear as attendees submit their workbooks.</div>';
+    if (grid.innerHTML !== emptyHtml) grid.innerHTML = emptyHtml;
+    grid.dataset.sig = 'empty';
     return;
   }
   const hiddenIds = JSON.parse(localStorage.getItem('bbb_hidden') || '[]');
   const visible = data.filter(r => !hiddenIds.includes(r.id || r.created_at)).slice(0, 50);
+  const sig = visible.map(r => `${r.id || r.created_at}:${r.response || ''}`).join('|') + `|filter:${wallFilter}|admin:${isAdmin}`;
+  if (grid.dataset.sig === sig) return;
+  grid.dataset.sig = sig;
   grid.innerHTML = visible.length ? visible.map(r => `
     <div class="rw-card" id="rwc-${r.id || r.created_at}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
