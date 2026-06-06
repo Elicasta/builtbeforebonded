@@ -8,7 +8,7 @@
 // Lock zoom on mobile phones only, allow on tablet/desktop
 (function() {
   function isMobilePhone() {
-    return window.innerWidth <= 480 || (navigator.maxTouchPoints > 0 && window.innerWidth <= 480);
+    return window.innerWidth <= 768 || (navigator.maxTouchPoints > 0 && window.innerWidth <= 768);
   }
   function setViewport(lock) {
     var mv = document.querySelector('meta[name="viewport"]');
@@ -149,9 +149,9 @@ body.am #qa-admin-panel { display: block !important; }
 .hero-ey { font-family: var(--fc); font-size: .64rem; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
 /* Hero title — same 3-line treatment */
 .hero-title { font-family: var(--fd); line-height: .9; text-transform: uppercase; letter-spacing: .02em; margin-bottom: 14px; }
-.hero-title .t-built  { display: block; font-size: clamp(32px, 5.5vw, 68px); color: var(--w); }
-.hero-title .t-before { display: block; font-size: clamp(32px, 5.5vw, 68px); color: var(--gold); }
-.hero-title .t-bonded { display: block; font-size: clamp(32px, 5.5vw, 68px); color: var(--w); }
+.hero-title .t-built  { display: block; font-size: clamp(48px, 8vw, 100px); color: var(--w); }
+.hero-title .t-before { display: block; font-size: clamp(48px, 8vw, 100px); color: var(--gold); }
+.hero-title .t-bonded { display: block; font-size: clamp(48px, 8vw, 100px); color: var(--w); }
 .hero-desc { font-family: var(--fc); font-size: .9rem; color: var(--mu); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 20px; line-height: 1.55; }
 .hero-meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
 .hero-mc { display: flex; align-items: center; gap: 6px; font-family: var(--fc); font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--mu); }
@@ -1416,13 +1416,12 @@ body.am .qa-bank-btn { display: flex; }
 
     
     <div class="s-grid" style="margin-bottom:0">
-      <div class="s-item" onclick="openSS(4)" style="cursor:pointer;grid-column:1/-1;border-color:rgba(184,137,59,.2)">
-        <div class="s-time" style="color:var(--gold)">Q &amp; A</div>
+      <div class="s-item" onclick="scrollToWB(4)" style="cursor:pointer;grid-column:1/-1;border-color:rgba(184,137,59,.2)">
+        <div class="s-time" style="color:var(--gold)">6:00 PM</div>
         <div style="flex:1">
-          <div class="s-label" style="color:var(--gold)">Open Floor</div>
-          <div class="s-name">Ask a Question</div>
-          <div class="s-sub">Questions for Elder Castaneda &mdash; answered live or personally after</div>
-          <div class="s-summary">Any question &mdash; personal, theological, or practical. Tap to submit.</div>
+          <div class="s-label" style="color:var(--gold)">Q &amp; A &middot; Open Floor</div>
+          <div class="s-name">Ask Elder Castaneda</div>
+          <div class="s-sub">Anything from today &mdash; personal, theological, or practical. Submit your question and it gets answered live.</div>
         </div>
         <div class="s-arrow">&rarr;</div>
       </div>
@@ -1813,15 +1812,17 @@ body.am .qa-bank-btn { display: flex; }
 
 <!-- ═══ PROJECTOR WAIT SCREEN ═══ -->
 <div class="projector-wait hidden" id="projector-wait">
-  <!-- Poster as background -->
-  <img src="bbb-poster.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.18;filter:contrast(1.1) brightness(.7)">
-  <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,13,13,.97) 40%,rgba(13,13,13,.7) 100%)"></div>
+  <!-- Poster background at 70% -->
+  <img src="bbb-poster.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7;filter:contrast(1.05) brightness(.55)">
+  <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,13,13,.6) 0%,rgba(13,13,13,.4) 100%)"></div>
+  <!-- Fullscreen button top-right -->
+  <button onclick="projectorToggleFS()" style="position:absolute;top:16px;right:16px;z-index:10;background:rgba(13,13,13,.7);border:1px solid rgba(184,137,59,.3);color:var(--gold);font-family:var(--fc);font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px;cursor:pointer;backdrop-filter:blur(4px)" id="proj-fs-btn">&#9974; Fullscreen</button>
   <!-- Content -->
-  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;width:100%">
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;width:100%;height:100%">
     <div style="font-family:var(--fc);font-size:clamp(.6rem,1.2vw,.9rem);font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:12px">
-      <span style="flex:1;height:1px;background:var(--ln)"></span>
+      <span style="flex:1;height:1px;background:rgba(184,137,59,.3)"></span>
       Formation &rarr; Healing &rarr; Wisdom &rarr; Obedience
-      <span style="flex:1;height:1px;background:var(--ln)"></span>
+      <span style="flex:1;height:1px;background:rgba(184,137,59,.3)"></span>
     </div>
     <div class="pw-title">
       <span class="t-built">Built</span>
@@ -1830,22 +1831,31 @@ body.am .qa-bank-btn { display: flex; }
     </div>
     <div class="pw-sub" style="margin-top:14px">Getting Your Life in Order Before Relationships Get Complicated</div>
     <div style="font-family:var(--fc);font-size:clamp(.65rem,1vw,.8rem);letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-top:8px">Elder Eli Castaneda &middot; Rosen Centre Hotel &middot; June 6, 2026</div>
-    <div style="width:1px;height:48px;background:linear-gradient(to bottom,var(--gold),transparent);margin:28px auto"></div>
+    <div style="width:1px;height:40px;background:linear-gradient(to bottom,var(--gold),transparent);margin:24px auto"></div>
     <div class="pw-status">
       <span class="pw-dot" id="pw-dot"></span>
       <span id="pw-status-text">Waiting for presenter...</span>
     </div>
-    <div class="pw-arc" style="margin-top:32px;max-width:500px;width:100%">
+    <div class="pw-arc" style="margin-top:24px;max-width:500px;width:100%">
       <div class="pw-arc-item">01 Formation</div>
       <div class="pw-arc-item">02 Healing</div>
       <div class="pw-arc-item">03 Wisdom</div>
       <div class="pw-arc-item">04 Obedience</div>
     </div>
-    <div style="font-family:var(--fc);font-size:clamp(.54rem,.9vw,.68rem);letter-spacing:.1em;text-transform:uppercase;color:rgba(184,137,59,.4);margin-top:32px;display:flex;align-items:center;gap:10px">
-      <span style="flex:1;height:1px;background:var(--ln)"></span>
-      Relationships do not create your foundation. They reveal it.
-      <span style="flex:1;height:1px;background:var(--ln)"></span>
+    <!-- QR codes -->
+    <div style="display:flex;gap:40px;flex-wrap:wrap;justify-content:center;margin-top:32px;align-items:flex-end">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <div id="proj-qr-seminar" style="background:#171717;padding:8px;border:1px solid rgba(184,137,59,.3);line-height:0"></div>
+        <div style="font-family:var(--fc);font-size:clamp(.5rem,.8vw,.65rem);letter-spacing:.14em;text-transform:uppercase;color:rgba(184,137,59,.7)">Join the Seminar</div>
+        <div style="font-family:var(--fc);font-size:clamp(.45rem,.7vw,.58rem);color:var(--mu);letter-spacing:.06em">builtbeforebonded.vercel.app</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <div id="proj-qr-apostolic" style="background:#171717;padding:8px;border:1px solid rgba(184,137,59,.3);line-height:0"></div>
+        <div style="font-family:var(--fc);font-size:clamp(.5rem,.8vw,.65rem);letter-spacing:.14em;text-transform:uppercase;color:rgba(184,137,59,.7)">Bible Study App</div>
+        <div style="font-family:var(--fc);font-size:clamp(.45rem,.7vw,.58rem);color:var(--mu);letter-spacing:.06em">apostolicguide.com</div>
+      </div>
     </div>
+    <div style="font-family:var(--fc);font-size:clamp(.5rem,.85vw,.64rem);letter-spacing:.1em;text-transform:uppercase;color:rgba(184,137,59,.35);margin-top:28px">Relationships do not create your foundation. They reveal it.</div>
   </div>
 </div>
 
@@ -2077,8 +2087,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2687,6 +2697,7 @@ function initRealtimeSync() {
 function initProjectorMode() {
   document.body.classList.add('projector-mode');
   document.getElementById('projector-wait').classList.remove('hidden');
+  initProjectorQR();
 
   // Load Supabase realtime client
   loadSupabaseClient(() => {
@@ -2709,6 +2720,13 @@ function initProjectorMode() {
       })
       .on('broadcast', { event: 'feature-question' }, ({ payload }) => {
         handleFeaturedQuestion(payload);
+      })
+      .on('broadcast', { event: 'show-wall' }, () => {
+        openWall();
+      })
+      .on('broadcast', { event: 'close-wall' }, () => {
+        document.getElementById('response-wall').classList.remove('on');
+        document.getElementById('constellation-wall').classList.remove('on');
       })
       .subscribe(status => {
         if (status === 'SUBSCRIBED') {
@@ -2947,6 +2965,13 @@ function initAttendeeFollow() {
         }
         // Show follow indicator briefly
         showFollowToggle();
+      })
+      .on('broadcast', { event: 'show-wall' }, () => {
+        openWall();
+      })
+      .on('broadcast', { event: 'close-wall' }, () => {
+        document.getElementById('response-wall').classList.remove('on');
+        document.getElementById('constellation-wall').classList.remove('on');
       })
       .on('broadcast', { event: 'presenter-connected' }, () => {
         attendeeFollowing = true;
@@ -3653,6 +3678,39 @@ function switchToAttendee() {
   document.getElementById('sh').classList.add('on');
 }
 
+function projectorToggleFS() {
+  const el = document.documentElement;
+  const btn = document.getElementById('proj-fs-btn');
+  if (!document.fullscreenElement) {
+    el.requestFullscreen().catch(() => {});
+    if (btn) btn.textContent = '✕ Exit Full';
+  } else {
+    document.exitFullscreen();
+    if (btn) btn.textContent = '⛶ Fullscreen';
+  }
+}
+
+function initProjectorQR() {
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  script.onload = () => {
+    const makeQR = (containerId, url) => {
+      const wrap = document.getElementById(containerId);
+      if (!wrap) return;
+      try {
+        new QRCode(wrap, { text: url, width: 100, height: 100, colorDark: '#B8893B', colorLight: '#171717', correctLevel: QRCode.CorrectLevel.M });
+        setTimeout(() => {
+          const tbl = wrap.querySelector('table'); if (tbl) tbl.style.display = 'none';
+          const img = wrap.querySelector('img'); if (img) img.style.cssText = 'display:block;width:100px;height:100px;';
+        }, 200);
+      } catch(e) {}
+    };
+    makeQR('proj-qr-seminar', 'https://builtbeforebonded.vercel.app');
+    makeQR('proj-qr-apostolic', 'https://apostolicguide.com');
+  };
+  document.head.appendChild(script);
+}
+
 function adminLogout() {
   localStorage.removeItem('bbb_a');
   localStorage.removeItem('bbb_u');
@@ -3776,9 +3834,17 @@ function admRenderQA() {
   if (!list) return;
   if (label) label.textContent = questions.length + ' question' + (questions.length !== 1 ? 's' : '');
   if (countEl) countEl.textContent = questions.length;
-  if (!questions.length) { list.innerHTML = '<div class="adm-empty">No questions yet.</div>'; return; }
-  list.innerHTML = questions.map((q, i) => `
-    <div class="adm-qa-item">
+
+  if (!questions.length) {
+    if (list.innerHTML !== '<div class="adm-empty">No questions yet.</div>') {
+      list.innerHTML = '<div class="adm-empty">No questions yet.</div>';
+    }
+    return;
+  }
+
+  // Diff render — only update if content actually changed
+  const newHtml = questions.map((q, i) => `
+    <div class="adm-qa-item" data-qid="${q.id}">
       <div class="adm-qa-num">${i+1}</div>
       <div style="flex:1">
         <div class="adm-qa-text">${q.text}</div>
@@ -3789,6 +3855,11 @@ function admRenderQA() {
         <button class="adm-qa-hide" onclick="admHideQ(${q.id})">&#10005; Hide</button>
       </div>
     </div>`).join('');
+
+  // Only re-render if question IDs changed
+  const existingIds = [...list.querySelectorAll('[data-qid]')].map(el => el.dataset.qid).join(',');
+  const newIds = questions.map(q => q.id).join(',');
+  if (existingIds !== newIds) list.innerHTML = newHtml;
 }
 
 function admFeature(id) {
@@ -3824,17 +3895,45 @@ function admRenderResponses() {
   const countEl = document.getElementById('adm-resp-count');
   if (countEl) countEl.textContent = data.length;
 
-  if (!data.length) { feed.innerHTML = '<div class="adm-empty">No responses yet.</div>'; return; }
+  if (!data.length) {
+    if (!feed.querySelector('.adm-empty')) feed.innerHTML = '<div class="adm-empty">No responses yet.</div>';
+    return;
+  }
 
-  feed.innerHTML = data.slice(0, 40).map(r => `
-    <div class="adm-resp-item" id="adm-ri-${r.id||r.created_at}">
-      <div class="cat">
-        <span>${r.category||''}</span>
-        <button class="adm-resp-hide" onclick="admHideResp('${r.id||r.created_at}')" title="Hide">&#10005;</button>
-      </div>
-      <div class="txt">${r.response||''}</div>
-      <div class="who">${r.name||'Anon'} &middot; ${r.created_at ? new Date(r.created_at).toLocaleTimeString() : (r.t||'')}</div>
-    </div>`).join('');
+  // Diff render — add new items at top without wiping existing ones
+  const existing = new Set([...feed.querySelectorAll('[data-rid]')].map(el => el.dataset.rid));
+  const slice = data.slice(0, 40);
+  const newItems = slice.filter(r => !existing.has(String(r.id || r.created_at)));
+
+  // If filter changed (count mismatch) do a full render
+  if (feed.querySelectorAll('[data-rid]').length !== Math.min(slice.length, feed.querySelectorAll('[data-rid]').length + newItems.length) && newItems.length === 0) {
+    feed.innerHTML = slice.map(r => renderRespItem(r)).join('');
+    return;
+  }
+
+  // Prepend only new items
+  newItems.reverse().forEach(r => {
+    const empty = feed.querySelector('.adm-empty');
+    if (empty) empty.remove();
+    feed.insertAdjacentHTML('afterbegin', renderRespItem(r));
+  });
+
+  // Trim to 40
+  const allItems = feed.querySelectorAll('[data-rid]');
+  if (allItems.length > 40) {
+    for (let i = 40; i < allItems.length; i++) allItems[i].remove();
+  }
+}
+
+function renderRespItem(r) {
+  return `<div class="adm-resp-item" id="adm-ri-${r.id||r.created_at}" data-rid="${r.id||r.created_at}">
+    <div class="cat">
+      <span>${r.category||''}</span>
+      <button class="adm-resp-hide" onclick="admHideResp('${r.id||r.created_at}')" title="Hide">&#10005;</button>
+    </div>
+    <div class="txt">${r.response||''}</div>
+    <div class="who">${r.name||'Anon'} &middot; ${r.created_at ? new Date(r.created_at).toLocaleTimeString() : (r.t||'')}</div>
+  </div>`;
 }
 
 function admHideResp(id) {
@@ -4128,22 +4227,26 @@ function openWall() {
   document.getElementById('response-wall').classList.add('on');
   // Auto-select current session if slideshow is open
   if (document.getElementById('ssl').classList.contains('on') && curSess >= 0) {
-    const targetSess = curSess + 1; // 1-indexed
+    const targetSess = curSess + 1;
     const filters = document.querySelectorAll('.rw-filter');
     filters.forEach(b => b.classList.remove('on'));
     const matchBtn = document.querySelector(`.rw-filter[data-sess="${targetSess}"]`);
-    if (matchBtn) {
-      matchBtn.classList.add('on');
-      wallFilter = targetSess;
-    } else {
-      // Fall back to All
-      const allBtn = document.querySelector('.rw-filter[data-sess="0"]');
-      if (allBtn) { allBtn.classList.add('on'); wallFilter = 0; }
-    }
+    if (matchBtn) { matchBtn.classList.add('on'); wallFilter = targetSess; }
+    else { const allBtn = document.querySelector('.rw-filter[data-sess="0"]'); if (allBtn) { allBtn.classList.add('on'); wallFilter = 0; } }
   }
   renderWall();
+  // Broadcast to projector and attendees
+  if (isAdmin && realtimeChannel) {
+    realtimeChannel.send({ type: 'broadcast', event: 'show-wall', payload: {} });
+  }
 }
-function closeWall() { document.getElementById('response-wall').classList.remove('on'); }
+function closeWall() {
+  document.getElementById('response-wall').classList.remove('on');
+  // Broadcast close to projector
+  if (isAdmin && realtimeChannel) {
+    realtimeChannel.send({ type: 'broadcast', event: 'close-wall', payload: {} });
+  }
+}
 function filterWall(btn) {
   document.querySelectorAll('.rw-filter').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
