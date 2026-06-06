@@ -418,10 +418,132 @@ body.am #qa-admin-panel { display: block !important; }
   z-index: 0;
 }
 @keyframes breathe { 0%, 100% { opacity: .5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
-/* mobile: natural height; desktop: 16:9 in fullscreen */
-.slide { min-height: clamp(260px, 60vw, 600px); max-width: 1060px; }
-:fullscreen .slide, :-webkit-full-screen .slide { min-height: unset; aspect-ratio: 16/9; }
+/* ══════════════════════════════════════
+   FULLSCREEN + PROJECTOR — SCALE TO FIT
+   Match the tab proportions but bigger.
+   Key insight: constrain content width,
+   scale fonts relative to a 1400px base.
+   ══════════════════════════════════════ */
+
+/* When browser is in fullscreen (F11 or admin fullscreen button) */
+:fullscreen #ssl,
+:-webkit-full-screen #ssl {
+  background: #000;
+}
+:fullscreen .ss-hdr,
+:-webkit-full-screen .ss-hdr { display: none !important; }
+:fullscreen .ss-stage,
+:-webkit-full-screen .ss-stage {
+  padding: 0 !important;
+  height: 100vh !important;
+  background: #000 !important;
+}
+:fullscreen .slide,
+:-webkit-full-screen .slide {
+  max-width: 1400px !important;
+  width: 100% !important;
+  min-height: unset !important;
+  height: 100vh !important;
+  border: none !important;
+  margin: 0 auto !important;
+}
+/* Teaching — fullscreen */
+:fullscreen .sl-te,
+:-webkit-full-screen .sl-te { padding: 60px 100px !important; }
+:fullscreen .sl-te-hl,
+:-webkit-full-screen .sl-te-hl { font-size: clamp(32px, 3.8vw, 64px) !important; max-width: 100% !important; }
+:fullscreen .sl-pts,
+:-webkit-full-screen .sl-pts { max-width: 100% !important; }
+:fullscreen .sl-pts li,
+:-webkit-full-screen .sl-pts li { font-size: clamp(16px, 1.6vw, 26px) !important; padding: 10px 0 !important; }
+/* Scripture — fullscreen */
+:fullscreen .sl-sc,
+:-webkit-full-screen .sl-sc { padding: 60px 100px !important; }
+:fullscreen .sl-sc-text,
+:-webkit-full-screen .sl-sc-text { font-size: clamp(18px, 2vw, 32px) !important; max-width: 100% !important; }
+:fullscreen .sl-sc-tk,
+:-webkit-full-screen .sl-sc-tk { font-size: clamp(22px, 2.6vw, 40px) !important; max-width: 100% !important; }
+/* Quote — fullscreen */
+:fullscreen .sl-qt,
+:-webkit-full-screen .sl-qt { padding: 60px 120px !important; }
+:fullscreen .sl-qt-text,
+:-webkit-full-screen .sl-qt-text { font-size: clamp(28px, 3.8vw, 64px) !important; max-width: 900px !important; }
+/* Conversation — fullscreen */
+:fullscreen .sl-cv,
+:-webkit-full-screen .sl-cv { padding: 60px 100px !important; }
+:fullscreen .sl-cv-q,
+:-webkit-full-screen .sl-cv-q { font-size: clamp(28px, 3.4vw, 56px) !important; max-width: 900px !important; }
+:fullscreen .sl-cv-n,
+:-webkit-full-screen .sl-cv-n { font-size: clamp(14px, 1.4vw, 22px) !important; max-width: 700px !important; }
+/* Workbook — fullscreen */
+:fullscreen .sl-wb,
+:-webkit-full-screen .sl-wb { padding: 50px 80px !important; }
+:fullscreen .sl-wb-q,
+:-webkit-full-screen .sl-wb-q { font-size: clamp(26px, 3vw, 48px) !important; max-width: 100% !important; }
+:fullscreen .sl-wb-items,
+:-webkit-full-screen .sl-wb-items { max-width: 100% !important; }
+/* Closing — fullscreen */
+:fullscreen .sl-cl,
+:-webkit-full-screen .sl-cl { padding: 60px 100px !important; }
+:fullscreen .sl-cl-title,
+:-webkit-full-screen .sl-cl-title { font-size: clamp(28px, 3.4vw, 56px) !important; }
+:fullscreen .sl-cl-list li,
+:-webkit-full-screen .sl-cl-list li { font-size: clamp(14px, 1.5vw, 24px) !important; }
+/* Prayer — fullscreen */
+:fullscreen .sl-pr,
+:-webkit-full-screen .sl-pr { padding: 60px 100px !important; }
+:fullscreen .sl-pr-title,
+:-webkit-full-screen .sl-pr-title { font-size: clamp(28px, 3.4vw, 54px) !important; }
+:fullscreen .sl-pr-pts li,
+:-webkit-full-screen .sl-pr-pts li { font-size: clamp(13px, 1.4vw, 22px) !important; }
+
+/* PROJECTOR MODE — same proportions, slightly bigger since it's a full wall */
+body.projector-mode .slide {
+  max-width: 100% !important;
+  min-height: 100% !important;
+  width: 100% !important;
+  flex: 1 !important;
+  border: none !important;
+  padding: 6vh 8vw !important;
+  justify-content: center !important;
+}
+body.projector-mode .sl-te { padding: 6vh 8vw !important; }
+body.projector-mode .sl-te-hl { font-size: clamp(36px, 4.5vw, 72px) !important; max-width: 100% !important; margin-bottom: 3vh !important; }
+body.projector-mode .sl-te-num { font-size: clamp(80px, 12vw, 160px) !important; }
+body.projector-mode .sl-pts { max-width: 100% !important; }
+body.projector-mode .sl-pts li { font-size: clamp(18px, 2vw, 30px) !important; padding: 1.2vh 0 !important; line-height: 1.4 !important; }
+body.projector-mode .sl-sc { padding: 6vh 8vw !important; border-left: 4px solid var(--gold) !important; }
+body.projector-mode .sl-sc-ref { font-size: clamp(12px, 1vw, 18px) !important; margin-bottom: 2vh !important; }
+body.projector-mode .sl-sc-text { font-size: clamp(20px, 2.4vw, 38px) !important; max-width: 100% !important; margin-bottom: 2.5vh !important; line-height: 1.5 !important; }
+body.projector-mode .sl-sc-tk { font-size: clamp(24px, 3vw, 48px) !important; max-width: 100% !important; }
+body.projector-mode .sl-qt { padding: 6vh 10vw !important; }
+body.projector-mode .sl-qm { font-size: clamp(60px, 9vw, 120px) !important; }
+body.projector-mode .sl-qt-text { font-size: clamp(30px, 4.2vw, 64px) !important; max-width: 80% !important; line-height: .97 !important; }
+body.projector-mode .sl-qa { font-size: clamp(12px, 1vw, 18px) !important; }
+body.projector-mode .sl-cv { padding: 6vh 8vw !important; }
+body.projector-mode .sl-cv-q { font-size: clamp(30px, 4vw, 60px) !important; max-width: 90% !important; }
+body.projector-mode .sl-cv-n { font-size: clamp(16px, 1.6vw, 26px) !important; max-width: 80% !important; }
+body.projector-mode .sl-cv-hdr { font-size: clamp(10px, .9vw, 16px) !important; }
+body.projector-mode .sl-wb { padding: 5vh 7vw !important; }
+body.projector-mode .sl-wb-q { font-size: clamp(30px, 3.8vw, 56px) !important; max-width: 100% !important; }
+body.projector-mode .sl-wb-i { font-size: clamp(14px, 1.4vw, 22px) !important; }
+body.projector-mode .sl-wb-items { max-width: 100% !important; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; gap: 6px !important; }
+body.projector-mode .sl-wb-item { font-size: clamp(12px, 1.3vw, 20px) !important; padding: 8px 12px !important; }
+body.projector-mode .sl-cl { padding: 6vh 8vw !important; }
+body.projector-mode .sl-cl-title { font-size: clamp(30px, 4vw, 60px) !important; margin-bottom: 3vh !important; }
+body.projector-mode .sl-cl-list li { font-size: clamp(16px, 1.8vw, 28px) !important; padding: 1vh 0 1vh 14px !important; }
+body.projector-mode .sl-pr { padding: 6vh 8vw !important; }
+body.projector-mode .sl-pr-title { font-size: clamp(32px, 4.2vw, 64px) !important; margin-bottom: 2.5vh !important; }
+body.projector-mode .sl-pr-pts li { font-size: clamp(14px, 1.6vw, 26px) !important; padding: .8vh 0 .8vh 14px !important; }
+body.projector-mode .sl-cover-title .t-built,
+body.projector-mode .sl-cover-title .t-before,
+body.projector-mode .sl-cover-title .t-bonded { font-size: clamp(52px, 8vw, 110px) !important; }
+body.projector-mode .sl-cover-sess { font-size: clamp(28px, 4vw, 56px) !important; }
+body.projector-mode .sl-cover-body { padding: 5vh 7vw !important; }
+body.projector-mode .sl-complete-title { font-size: clamp(36px, 5vw, 70px) !important; }
+body.projector-mode .sl-complete-icon { font-size: clamp(52px, 7vw, 90px) !important; }
 /* blueprint corner */
+.slide { min-height: clamp(260px, 60vw, 600px); max-width: 1060px; }
 .slide::after { content: ''; position: absolute; top: 0; right: 0; width: 120px; height: 120px; background-image: linear-gradient(rgba(108,108,108,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(108,108,108,.06) 1px, transparent 1px); background-size: 14px 14px; pointer-events: none; z-index: 0; }
 
 /* COVER */
@@ -667,61 +789,10 @@ body.projector-mode #ssl {
   inset: 0 !important;
 }
 body.projector-mode .ss-stage { background: #000; }
-/* Constellation and response wall on top in projector */
-body.projector-mode #constellation-wall { z-index: 5000; }
-body.projector-mode #response-wall { z-index: 5000; }
-
-/* ══════════════════════════════════════
-   PROJECTOR MODE — LARGE SCREEN LAYOUT
-   ══════════════════════════════════════ */
-body.projector-mode .slide {
-  padding: 60px 80px !important;
-  justify-content: center !important;
-}
-/* Teaching slides */
-body.projector-mode .sl-te { padding: 80px 100px !important; }
-body.projector-mode .sl-te-hl { font-size: clamp(48px, 6vw, 96px) !important; max-width: 100% !important; margin-bottom: 40px !important; }
-body.projector-mode .sl-te-num { font-size: clamp(100px, 16vw, 200px) !important; }
-body.projector-mode .sl-pts { max-width: 100% !important; }
-body.projector-mode .sl-pts li { font-size: clamp(20px, 2.4vw, 36px) !important; padding: 14px 0 !important; line-height: 1.35 !important; }
-/* Scripture slides */
-body.projector-mode .sl-sc { padding: 80px 100px !important; }
-body.projector-mode .sl-sc-ref { font-size: 1rem !important; letter-spacing: .22em !important; margin-bottom: 28px !important; }
-body.projector-mode .sl-sc-text { font-size: clamp(24px, 3.2vw, 48px) !important; max-width: 100% !important; margin-bottom: 32px !important; line-height: 1.4 !important; }
-body.projector-mode .sl-sc-tk { font-size: clamp(28px, 3.8vw, 56px) !important; max-width: 100% !important; }
-/* Quote slides */
-body.projector-mode .sl-qt { padding: 80px 120px !important; }
-body.projector-mode .sl-qm { font-size: clamp(80px, 12vw, 140px) !important; }
-body.projector-mode .sl-qt-text { font-size: clamp(36px, 5.5vw, 80px) !important; max-width: 100% !important; line-height: .97 !important; }
-body.projector-mode .sl-qa { font-size: .9rem !important; }
-/* Conversation slides */
-body.projector-mode .sl-cv { padding: 80px 100px !important; }
-body.projector-mode .sl-cv-q { font-size: clamp(36px, 5vw, 72px) !important; max-width: 100% !important; }
-body.projector-mode .sl-cv-n { font-size: clamp(18px, 2vw, 28px) !important; max-width: 100% !important; }
-body.projector-mode .sl-cv-hdr { font-size: .85rem !important; }
-/* Workbook slides */
-body.projector-mode .sl-wb { padding: 60px 80px !important; }
-body.projector-mode .sl-wb-q { font-size: clamp(36px, 4.5vw, 64px) !important; max-width: 100% !important; }
-body.projector-mode .sl-wb-i { font-size: clamp(16px, 1.8vw, 24px) !important; }
-body.projector-mode .sl-wb-items { max-width: 100% !important; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; gap: 8px !important; }
-body.projector-mode .sl-wb-item { font-size: clamp(14px, 1.6vw, 22px) !important; padding: 10px 14px !important; }
-/* Closing slides */
-body.projector-mode .sl-cl { padding: 80px 100px !important; }
-body.projector-mode .sl-cl-title { font-size: clamp(36px, 5vw, 72px) !important; margin-bottom: 32px !important; }
-body.projector-mode .sl-cl-list li { font-size: clamp(18px, 2.2vw, 32px) !important; padding: 12px 0 12px 16px !important; }
-/* Prayer slides */
-body.projector-mode .sl-pr { padding: 80px 100px !important; }
-body.projector-mode .sl-pr-title { font-size: clamp(40px, 5.5vw, 76px) !important; margin-bottom: 28px !important; }
-body.projector-mode .sl-pr-pts li { font-size: clamp(16px, 2vw, 28px) !important; padding: 10px 0 10px 16px !important; }
-/* Cover slide */
-body.projector-mode .sl-cover-title .t-built,
-body.projector-mode .sl-cover-title .t-before,
-body.projector-mode .sl-cover-title .t-bonded { font-size: clamp(60px, 10vw, 130px) !important; }
-body.projector-mode .sl-cover-sess { font-size: clamp(36px, 5vw, 68px) !important; }
-body.projector-mode .sl-cover-body { padding: 48px 80px !important; }
-/* Session complete */
-body.projector-mode .sl-complete-title { font-size: clamp(40px, 6vw, 80px) !important; }
-body.projector-mode .sl-complete-icon { font-size: clamp(60px, 9vw, 110px) !important; }
+/* Constellation disabled */
+#constellation-wall { display: none !important; }
+.adm-tool-btn[onclick*="openConstellation"] { display: none !important; }
+#const-btn { display: none !important; }
 .projector-wait { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 500; }
 .projector-wait.hidden { display: none; }
 .pw-title { font-family: var(--fd); line-height: .88; text-transform: uppercase; margin-bottom: 8px; }
@@ -2161,8 +2232,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -4505,25 +4576,8 @@ function checkResume() {
 let cwFilterSess = 0;
 let cwAnimFrame = null;
 
-function openConstellation() {
-  document.getElementById('constellation-wall').classList.add('on');
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-  // Auto-select current session if slideshow is open
-    if (document.getElementById('ssl').classList.contains('on') && curSess >= 0) {
-      const targetSess = curSess + 1;
-      const filters = document.querySelectorAll('.cw-filter');
-      filters.forEach(b => b.classList.remove('on'));
-      const matchBtn = document.querySelector(`.cw-filter[data-sess="${targetSess}"]`);
-      if (matchBtn) { matchBtn.classList.add('on'); cwFilterSess = targetSess; }
-      else { const allBtn = document.querySelector('.cw-filter[data-sess="0"]'); if (allBtn) { allBtn.classList.add('on'); cwFilterSess = 0; } }
-    }
-    startConstellation();
-  }));
-}
-function closeConstellation() {
-  document.getElementById('constellation-wall').classList.remove('on');
-  if (cwAnimFrame) { cancelAnimationFrame(cwAnimFrame); cwAnimFrame = null; }
-}
+function openConstellation() { /* disabled */ }
+function closeConstellation() { /* disabled */ }
 
 // Resize constellation on orientation change
 window.addEventListener('resize', () => {
