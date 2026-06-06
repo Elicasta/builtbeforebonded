@@ -477,6 +477,19 @@ body.am #qa-admin-panel { display: block !important; }
   display: flex !important;
 }
 
+/* CRITICAL: type-specific flex rules override display:none on inactive slides,
+   causing all slides to stack — last one (sc_complete) always shows on top.
+   This guard ensures only the active slide is ever visible. */
+#ss-slides .slide-scaler .slide:not(.on) {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+#ss-slides .slide-scaler .slide.on {
+  display: flex !important;
+  visibility: visible !important;
+}
+
 /* Centered slides — quote, conversation, session-complete */
 .slide-scaler .sl-qt,
 .slide-scaler .sl-cv,
@@ -1467,21 +1480,6 @@ body.am .qa-bank-btn { display: flex; }
   .sess-grid { grid-template-columns: 1fr; }
   .sl-wb-items { grid-template-columns: 1fr; }
 }
-
-
-/* ── FIX: Only the active slide may render.
-   Several 1920×1080 layout rules use display:flex for slide types.
-   Without this guard, hidden slides can still render and stack above the
-   current slide, making projector mode appear stuck on the final complete slide. */
-#ss-slides .slide-scaler .slide:not(.on) {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-#ss-slides .slide-scaler .slide.on {
-  visibility: visible !important;
-}
-
 </style>
 </head>
 <body>
@@ -2291,8 +2289,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2838,11 +2836,6 @@ function renderDots(count) {
 }
 function goTo(i) {
   const count = SESSIONS[curSess].slides.length;
-  i = Math.max(0, Math.min(Number(i) || 0, count - 1));
-  document.querySelectorAll('#ss-slides .slide-scaler').forEach((wrap, j) => {
-    wrap.style.display = j === i ? 'block' : 'none';
-    wrap.style.pointerEvents = j === i ? 'auto' : 'none';
-  });
   document.querySelectorAll('#ss-slides .slide').forEach((s, j) => {
     if (j === i) {
       // Force animation restart by removing and re-adding class
