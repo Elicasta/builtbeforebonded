@@ -438,15 +438,27 @@ body.am #qa-admin-panel { display: block !important; }
   width: 100% !important;
   overflow: hidden !important;
   background: #000 !important;
+  position: relative !important;
 }
 
-/* The slide scaler — wraps the 1920×1080 slide */
+/* Give the stage a 16:9 height relative to its width */
+.ss-stage::before {
+  content: '';
+  display: block;
+  padding-top: 56.25%; /* 9/16 = 56.25% — forces 16:9 */
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* The slide scaler — absolutely positioned, centered */
 .slide-scaler {
   width: 1920px;
   height: 1080px;
-  position: relative;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
   transform-origin: center center;
-  flex-shrink: 0;
+  /* JS sets: transform: translate(-50%, -50%) scale(n) */
 }
 
 /* Every .slide inside the scaler fills 1920×1080 */
@@ -459,6 +471,10 @@ body.am #qa-admin-panel { display: block !important; }
   inset: 0 !important;
   border: none !important;
   overflow: hidden !important;
+  display: none !important;
+}
+.slide-scaler .slide.on {
+  display: flex !important;
 }
 
 /* Centered slides — quote, conversation, session-complete */
@@ -536,34 +552,34 @@ body.am #qa-admin-panel { display: block !important; }
 .slide-scaler .sl-complete-icon { font-size: 100px !important; }
 .slide-scaler .sl-complete-title { font-size: 80px !important; }
 
-/* Projector stage — fills entire viewport, black bars if needed */
-body.projector-mode .ss-stage {
+/* Projector stage — fills entire viewport */
+body.projector-mode #ssl {
   position: fixed !important;
   inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
+  background: #000 !important;
 }
-
-/* Fullscreen stage */
+body.projector-mode .ss-hdr { display: none !important; }
+body.projector-mode .ss-stage,
 :fullscreen .ss-stage,
 :-webkit-full-screen .ss-stage {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
+  padding: 0 !important;
+  background: #000 !important;
 }
+body.projector-mode .ss-stage::before,
+:fullscreen .ss-stage::before,
+:-webkit-full-screen .ss-stage::before { display: none !important; }
 
-/* Hide browser chrome in fullscreen */
+body.projector-mode .ss-arrow,
+body.projector-mode .ss-dots,
+body.projector-mode .ss-prog-bar,
+body.projector-mode .presenter-bar { display: none !important; }
+
 :fullscreen .ss-hdr,
 :-webkit-full-screen .ss-hdr { display: none !important; }
-
-/* Projector-mode slide overrides still needed for non-scaler path */
-body.projector-mode .slide {
-  max-width: none !important;
-  width: 100% !important;
-  flex: 1 !important;
-  border: none !important;
-}
 
 /* COVER */
 .sl-cover { position: relative; background: var(--bgd); border: 1px solid var(--ln); justify-content: center; align-items: center; min-height: clamp(300px,60vw,620px); }
@@ -780,36 +796,7 @@ body.projector-mode .sound-toggle { display: none !important; }
 
 body.projector-mode #sh { background: var(--bg); }
 
-/* Projector slideshow — zero chrome, fill entire screen */
-body.projector-mode .ss-hdr { display: none !important; }
-body.projector-mode .ss-stage {
-  padding: 0 !important;
-  height: 100vh !important;
-  width: 100vw !important;
-  position: fixed !important;
-  inset: 0 !important;
-  align-items: stretch !important;
-  justify-content: stretch !important;
-}
-body.projector-mode .ss-arrow { display: none !important; }
-body.projector-mode .ss-dots { display: none !important; }
-body.projector-mode .ss-prog-bar { display: none !important; }
-body.projector-mode .presenter-bar { display: none !important; }
-body.projector-mode .slide {
-  max-width: none !important;
-  min-height: 100% !important;
-  width: 100% !important;
-  height: 100vh !important;
-  flex: 1 !important;
-  border: none !important;
-  align-self: stretch !important;
-}
-body.projector-mode #ssl {
-  background: #000;
-  position: fixed !important;
-  inset: 0 !important;
-}
-body.projector-mode .ss-stage { background: #000; }
+
 /* Constellation disabled */
 #constellation-wall { display: none !important; }
 .adm-tool-btn[onclick*="openConstellation"] { display: none !important; }
@@ -2253,8 +2240,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
@@ -2630,11 +2617,10 @@ function scaleSlides() {
   if (!stage) return;
   const stageW = stage.clientWidth || window.innerWidth;
   const stageH = stage.clientHeight || window.innerHeight;
-  const scaleX = stageW / 1920;
-  const scaleY = stageH / 1080;
-  const scale = Math.min(scaleX, scaleY);
+  if (!stageW || !stageH) return;
+  const scale = Math.min(stageW / 1920, stageH / 1080);
   document.querySelectorAll('.slide-scaler').forEach(scaler => {
-    scaler.style.transform = `scale(${scale})`;
+    scaler.style.transform = `translate(-50%, -50%) scale(${scale})`;
   });
 }
 window.addEventListener('resize', scaleSlides);
