@@ -499,13 +499,15 @@ body.am #qa-admin-panel { display: block !important; }
 
 /* PROJECTOR MODE — same proportions, slightly bigger since it's a full wall */
 body.projector-mode .slide {
-  max-width: 100% !important;
+  max-width: none !important;
   min-height: 100% !important;
   width: 100% !important;
+  height: 100vh !important;
   flex: 1 !important;
   border: none !important;
   padding: 6vh 8vw !important;
   justify-content: center !important;
+  align-self: stretch !important;
 }
 body.projector-mode .sl-te { padding: 6vh 8vw !important; }
 body.projector-mode .sl-te-hl { font-size: clamp(36px, 4.5vw, 72px) !important; max-width: 100% !important; margin-bottom: 3vh !important; }
@@ -777,11 +779,13 @@ body.projector-mode .ss-dots { display: none !important; }
 body.projector-mode .ss-prog-bar { display: none !important; }
 body.projector-mode .presenter-bar { display: none !important; }
 body.projector-mode .slide {
-  max-width: 100% !important;
+  max-width: none !important;
   min-height: 100% !important;
   width: 100% !important;
+  height: 100vh !important;
   flex: 1 !important;
   border: none !important;
+  align-self: stretch !important;
 }
 body.projector-mode #ssl {
   background: #000;
@@ -1782,7 +1786,7 @@ body.am .qa-bank-btn { display: flex; }
 <textarea class="wb-ta" placeholder="Specific. What changes now?" data-q="s4q4" oninput="save(this)"></textarea>
 <div class="wb-row">
 <label class="wb-anon" onclick="tog(this)"><div class="tog"></div><span>Post anonymously</span></label>
-<button class="wb-submit" onclick="submit(this,'s4q4','Build Different',4,'What does "build different" mean for you? One obedience step this week.')">Submit</button>
+<button class="wb-submit" onclick="submit(this,'s4q4','Build Different',4,'What does build different mean for you? One obedience step this week.')">Submit</button>
 <span class="wb-ok">&#10003; Sent</span>
 </div></div></div>
         <div class="wb-email-row">
@@ -2232,8 +2236,8 @@ const SEMINAR_DATE = new Date('2026-06-06T12:00:00');
 const PW_ATTENDEE = 'bbb2026';
 const PW_ADMIN    = 'bbb2026admin';
 // Set after deploying to Vercel:
-window.SB_URL = 'https://lmcqjintmarlytkbjmsq.supabase.co';
-window.SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtY3FqaW50bWFybHl0a2JqbXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDA1NzEsImV4cCI6MjA5NjI3NjU3MX0.rB7wvZCIYMueIToOG-ZLcwG5KNGG5kzdeAD4CiB4znE';
+window.SB_URL = '';
+window.SB_KEY = '';
 
 // ── STATE ──
 let mode = 'cd', isAdmin = false, userName = '', liveData = [], liveTimer = null;
